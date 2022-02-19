@@ -9,7 +9,6 @@ dependencies:
   - bzip2=1.0.8=h0d85af4_4
   - ca-certificates=2021.10.26=hecd8cb5_2
   - certifi=2021.10.8=py38hecd8cb5_2
-  - cython=0.29.25=py38he9d5cce_0
   - icu=69.1=he49afe7_0
   - libblas=3.9.0=13_osx64_openblas
   - libcblas=3.9.0=13_osx64_openblas
