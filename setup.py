@@ -1,11 +1,16 @@
 from setuptools import Extension, setup
 from Cython.Build import cythonize
+import subprocess
 
-extensions = [Extension("mat",["mat.pyx"],
-    include_dirs=["/Users/jmcbr/opt/anaconda3/include/google/protobuf", "/opt/homebrew/include", "./build/oneTBB/include",'/opt/homebrew/Cellar/boost/1.76.0/include/'],
-    library_dirs=['./build/oneTBB/build/','/opt/homebrew/Cellar/boost/1.76.0/lib/','/opt/homebrew/opt/boost/lib/','/Users/jmcbr/opt/anaconda3/envs/usher/lib/'],
+#build the tbb library. It comes with a makefile prepared.
+subprocess.run("make -j",cwd="./dependencies/tbb/build",shell=True,check=True)
+#build the matree protoc reader files for this system and put them in the src
+subprocess.run("protoc --cpp_out=./src parsimony.proto",shell=True,check=True)
+
+extensions = [Extension("mat",["src/mat.pyx"],
+    include_dirs=["${CONDA_PREFIX}/include/google/protobuf", "${CONDA_PREFIX}/include/", "./dependencies/oneTBB/include"],
+    library_dirs=['${CONDA_PREFIX}/lib/','./dependencies/oneTBB/build/'],
     libraries=['tbb', 'protobuf','boost_system','boost_iostreams'],
-    #extra_compile_args=['-std=c++11'],
     language='c++'
     )]
 
