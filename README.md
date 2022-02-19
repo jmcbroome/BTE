@@ -30,6 +30,16 @@ In the cloned directory before proceeding. Create a conda environment containing
 conda env create -f matreepy.yml
 ```
 
+After the submodule is available, it needs to be built for your system. Navigate to its directory and apply make.
+
+```
+cd dependencies/oneTBB/
+make -j
+cd ../..
+```
+
+If this step fails because of "missing architecture" when building tbb, you can try manually setting the architecture to use- add "arch=x86_64" for example to the make call for example.
+
 ### Building the Python-importable library
 Once all libraries are available, proceed to compile the .so.
 ```
