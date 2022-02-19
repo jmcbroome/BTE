@@ -4,6 +4,9 @@ from libcpp.string cimport string
 
 
 cdef class MATNode:
+    """
+    A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.
+    """
     cdef mat.Node* n
 
     cdef from_node(self, mat.Node* n):
@@ -32,6 +35,11 @@ cdef class MATNode:
         return [m.get_string().decode("UTF-8") for m in self.n.mutations]
 
 cdef class MATree:
+    """
+    A wrapper around the MAT Tree class. Includes functions to save and load from parsimony .pb files or a newick. Includes 
+    numerous functions for tree traversal including both breadth-first and depth-first, the ability to search for a node by name and the
+    ability to traverse from a specified node back to the root node.
+    """
     cdef mat.Tree t
 
     def load_from(self,file):
