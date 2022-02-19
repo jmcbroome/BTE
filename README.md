@@ -38,7 +38,7 @@ make -j
 cd ../..
 ```
 
-If this step fails because of "missing architecture" when building tbb, you can try manually setting the architecture to use- add "arch=x86_64" for example to the make call for example.
+If this step fails because of "missing architecture" when building tbb, you can try manually setting the architecture to use- add "arch=x86_64" to the make call for example.
 
 ### Building the Python-importable library
 Once all libraries are available, proceed to compile the .so.
