@@ -1,13 +1,24 @@
 # matreePy
-Cython API for the Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit (In Early Development)
+Cython API for the Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit (In Early Development). Developer version distributed as source. 
 
-## Dependencies
+## Core Dependencies
+
+Cython 
+
 Boost
 
 Protobuf
 
 tbb 2019_U6 (included here)
 
+Conda, while not strictly required, is very highly recommended for environment management.
+
+You will also need the general suite of C++ compiler tools. On a mac, you will need xcode CLI. On linux, you may need other compiler tools. You may want to call 
+```
+conda install -c conda-forge cxx-compiler
+conda install -c anaconda make 
+```
+If you don't have make/cmake, clang/gcc and related available.
 
 ## Build Instructions
 
@@ -25,11 +36,6 @@ If you forget, you can use
 git submodule update --init
 ```
 
-In the cloned directory before proceeding. Create a conda environment containing our other key dependencies.
-```
-conda env create -f matreepy.yml
-```
-
 After the submodule is available, it needs to be built for your system. Navigate to its directory and apply make.
 
 ```
@@ -39,6 +45,21 @@ cd ../..
 ```
 
 If this step fails because of "missing architecture" when building tbb, you can try manually setting the architecture to use- add "arch=x86_64" to the make call for example.
+
+The rest of our key dependencies are handled by conda.
+
+```
+conda env create -f matreepy.yml
+```
+
+If the .yml isn't working for you (which it may not at this time), you can try:
+
+```
+conda create --name matreepy
+conda activate matreepy
+conda install -c anaconda protobuf
+conda install -c conda-forge boost-cpp cython
+```
 
 ### Building the Python-importable library
 
