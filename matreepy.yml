@@ -7,8 +7,9 @@ dependencies:
   - boost=1.77.0=py38hb0f0857_0
   - boost-cpp=1.77.0=hf3dc895_1
   - bzip2=1.0.8=h0d85af4_4
-  - ca-certificates=2021.10.8=h033912b_0
-  - certifi=2021.10.8=py38h50d1736_1
+  - ca-certificates=2021.10.26=hecd8cb5_2
+  - certifi=2021.10.8=py38hecd8cb5_2
+  - cython=0.29.25=py38he9d5cce_0
   - icu=69.1=he49afe7_0
   - libblas=3.9.0=13_osx64_openblas
   - libcblas=3.9.0=13_osx64_openblas
@@ -24,7 +25,7 @@ dependencies:
   - lz4-c=1.9.3=he49afe7_1
   - ncurses=6.2=h0a44026_1
   - numpy=1.22.2=py38h9d72dae_0
-  - openssl=1.1.1l=h0d85af4_0
+  - openssl=1.1.1m=hca72f7f_0
   - pip=20.2.4=py38_0
   - protobuf=3.13.0.1=py38hb1e8313_1
   - python=3.8.5=h26836e1_1
