@@ -75,6 +75,6 @@ From a script in the same directory as the .so!
 To ensure the library is built and working correctly, you can obtain the latest global mutation annotated tree from the repository linked above and call our test script.
 
 ```
-wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb
+wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
 python3 test.py
 ```
