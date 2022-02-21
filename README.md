@@ -1,5 +1,10 @@
 # matreePy
-Cython API for the Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit (In Early Development). Developer version distributed as source. 
+Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher) (In Early Development). Developer version distributed as source. 
+
+# Overview
+This repository will allow the user to leverage the power of the Mutation Annotated Tree file format and library in their Python scripts, allowing for efficient and effective analysis of global SARS-CoV-2 and other pathogen phylogenies. 
+
+UCSC maintains a daily-updated mutation-annotated tree in protobuf format containing all publicly available SARS-CoV-2 genome sequences [here](http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/). To try out this tool, download the latest tree, build the library, and jump straight to your Python analysis!
 
 ## Core Dependencies
 
@@ -42,7 +47,7 @@ Our key dependencies are handled by conda.
 conda env create -f matreepy.yml
 ```
 
-If the .yml isn't working for you (which it may not at this time), you can try:
+If the .yml isn't working for you, you can try:
 
 ```
 conda create --name matreepy
@@ -63,5 +68,13 @@ If successful, you can now import from the .so into your python environment with
 import mat
 ```
 
-From a script in the same directory as the .so! Some basic syntax examples are available in the test.py; further updates to the API for usability and tutorials are forthcoming.
+From a script in the same directory as the .so!
 
+### Example Usage
+
+To ensure the library is built and working correctly, you can obtain the latest global mutation annotated tree from the repository linked above and call our test script.
+
+```
+wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
+python3 test.py
+```
