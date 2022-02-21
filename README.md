@@ -16,7 +16,7 @@ Protobuf
 
 tbb 2019
 
-Conda, while not strictly required, is very highly recommended for environment and dependency management.
+Conda is required for environment and dependency management.
 
 You will also need the general suite of C++ compiler tools. On a mac, you will need xcode CLI. On linux, you may need other compiler tools. You may want to call 
 ```
