@@ -1,7 +1,6 @@
 import mat
-t = mat.MATree()
 print("Loading tree...")
-t.load_from("gisaidAndPublic.2021-12-16.masked.pb")
+t = mat.MATree("public-latest.all.masked.pb.gz")
 print("Tree successfully loaded.")
 parsimony = t.get_parsimony_score()
 print("Parsimony score:", parsimony)

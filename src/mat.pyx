@@ -10,6 +10,11 @@ cdef class MATNode:
     cdef mat.Node* n
 
     cdef from_node(self, mat.Node* n):
+        '''
+        Load a node object from a MAT node. Attributes specific to the node such as mutations and identifier
+        will be loaded automatically into python attributes and relational attributes to other nodes can be accessed through fetch methods 
+        to the C++ class attributes.
+        '''
         self.n = n
 
     def is_leaf(self):
@@ -34,6 +39,9 @@ cdef class MATNode:
     def get_mutations(self):
         return [m.get_string().decode("UTF-8") for m in self.n.mutations]
 
+    def get_annotations(self):
+        return [m.decode("UTF-8") for m in self.n.clade_annotations]
+
 cdef class MATree:
     """
     A wrapper around the MAT Tree class. Includes functions to save and load from parsimony .pb files or a newick. Includes 
@@ -42,13 +50,24 @@ cdef class MATree:
     """
     cdef mat.Tree t
 
-    def load_from(self,file):
+    def __init__(self, fpath=""):
+        if fpath != "":
+            if fpath[-3:] == ".pb" or fpath[-6:] == ".pb.gz":
+                self.from_pb(fpath)
+            elif fpath[-3:] == ".nwk":
+                self.from_newick(fpath)
+            else:
+                raise Exception("Invalid file type. Must be .pb or .nwk")
+        else:
+            self.t = mat.Tree()
+
+    def from_pb(self,file):
         self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
 
-    def save_to(self,file):
+    def save_pb(self,file):
         mat.save_mutation_annotated_tree(self.t,file.encode("UTF-8"))
 
-    def create_from_newick(self,nwk):
+    def from_newick(self,nwk):
         self.t = mat.create_tree_from_newick(nwk.encode("UTF-8"))
 
     def get_parsimony_score(self):
@@ -98,3 +117,4 @@ cdef class MATree:
 
     def rsearch(self,nid,include_self=False):
         return self.rsearch_helper(nid,include_self)
+

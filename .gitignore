@@ -1,4 +1,5 @@
 *.pb
+*.pb.gz
 *.so
 src/mat.cpp
 src/parsimony.pb.cc
