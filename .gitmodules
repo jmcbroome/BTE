@@ -2,3 +2,6 @@
 	path = dependencies/oneTBB
 	url = https://github.com/oneapi-src/oneTBB
 
+[submodule "dependencies/usher"]
+	path = src/usher
+	url = https://github.com/yatisht/usher

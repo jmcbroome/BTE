@@ -9,9 +9,9 @@ Boost
 
 Protobuf
 
-tbb 2019_U6 (included here)
+tbb 2019
 
-Conda, while not strictly required, is very highly recommended for environment management.
+Conda, while not strictly required, is very highly recommended for environment and dependency management.
 
 You will also need the general suite of C++ compiler tools. On a mac, you will need xcode CLI. On linux, you may need other compiler tools. You may want to call 
 ```
@@ -24,7 +24,7 @@ If you don't have make/cmake, clang/gcc and related available.
 
 ### First Time Setup
 
-This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. oneTBB is included as a submodule given our dependency on an older version of the library. To ensure oneTBB is available to be built, when cloned, use
+This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. We also include the UShER online phylogenetics toolkit as a submodule to provide the source code files wrapped by this tool.
 
 ```
 git clone --recurse-submodules https://github.com/jmcbroome/matreePy
@@ -36,17 +36,7 @@ If you forget, you can use
 git submodule update --init
 ```
 
-After the submodule is available, it needs to be built for your system. Navigate to its directory and apply make.
-
-```
-cd dependencies/oneTBB/
-make -j
-cd ../..
-```
-
-If this step fails because of "missing architecture" when building tbb, you can try manually setting the architecture to use- add "arch=x86_64" to the make call for example.
-
-The rest of our key dependencies are handled by conda.
+Our key dependencies are handled by conda.
 
 ```
 conda env create -f matreepy.yml
@@ -57,8 +47,7 @@ If the .yml isn't working for you (which it may not at this time), you can try:
 ```
 conda create --name matreepy
 conda activate matreepy
-conda install -c anaconda protobuf
-conda install -c conda-forge boost-cpp cython
+conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=2019.0
 ```
 
 ### Building the Python-importable library

@@ -1,41 +1,15 @@
 name: matreepy
 channels:
-  - anaconda
-  - conda-forge
   - defaults
 dependencies:
-  - boost=1.77.0=py38hb0f0857_0
-  - boost-cpp=1.77.0=hf3dc895_1
-  - bzip2=1.0.8=h0d85af4_4
-  - ca-certificates=2021.10.26=hecd8cb5_2
-  - certifi=2021.10.8=py38hecd8cb5_2
-  - icu=69.1=he49afe7_0
-  - libblas=3.9.0=13_osx64_openblas
-  - libcblas=3.9.0=13_osx64_openblas
-  - libcxx=12.0.1=habf9029_1
-  - libedit=3.1.20191231=h1de35cc_1
-  - libffi=3.3=hb1e8313_2
-  - libgfortran=5.0.0=9_3_0_h6c81a4c_23
-  - libgfortran5=9.3.0=h6c81a4c_23
-  - liblapack=3.9.0=13_osx64_openblas
-  - libopenblas=0.3.18=openmp_h3351f45_0
-  - libprotobuf=3.13.0.1=hab81aa3_0
-  - llvm-openmp=13.0.1=hda6cdc1_0
-  - lz4-c=1.9.3=he49afe7_1
-  - ncurses=6.2=h0a44026_1
-  - numpy=1.22.2=py38h9d72dae_0
-  - openssl=1.1.1m=hca72f7f_0
-  - pip=20.2.4=py38_0
-  - protobuf=3.13.0.1=py38hb1e8313_1
-  - python=3.8.5=h26836e1_1
-  - python_abi=3.8=2_cp38
-  - readline=8.0=h1de35cc_0
-  - setuptools=50.3.0=py38h0dc7051_1
-  - six=1.15.0=py_0
-  - sqlite=3.33.0=hffcf06c_0
-  - tk=8.6.10=hb0a8c7a_0
-  - wheel=0.35.1=py_0
-  - xz=5.2.5=h1de35cc_0
-  - zlib=1.2.11=h1de35cc_3
-  - zstd=1.5.0=h582d3a0_0
+  - boost
+  - ca-certificates
+  - certifi
+  - openssl
+  - cython
+  - cxx-compiler
+  - cmake=3.19.6
+  - autoconf
+  - protobuf=3.19
+  - tbb-devel=2019.0
 prefix: /Users/jmcbr/opt/anaconda3/envs/matreepy

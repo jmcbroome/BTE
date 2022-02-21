@@ -12,8 +12,8 @@ if CONDA_PREFIX == None:
 subprocess.run("protoc --cpp_out=./src parsimony.proto",shell=True,check=True)
 
 extensions = [Extension("mat",["src/mat.pyx"],
-    include_dirs=[CONDA_PREFIX+"/include/google/protobuf", CONDA_PREFIX+"/include/", "dependencies/oneTBB/include"],
-    library_dirs=[CONDA_PREFIX+'/lib/','dependencies/oneTBB/build'],
+    include_dirs=[CONDA_PREFIX+"/include/google/protobuf", CONDA_PREFIX+"/include/"],
+    library_dirs=[CONDA_PREFIX+'/lib/'],
     libraries=['tbb', 'protobuf','boost_system','boost_iostreams'],
     language='c++'
     )]  
