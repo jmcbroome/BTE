@@ -29,19 +29,7 @@ If you don't have make/cmake, clang/gcc and related available.
 
 ### First Time Setup
 
-This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. We also include the UShER online phylogenetics toolkit as a submodule to provide the source code files wrapped by this tool.
-
-```
-git clone --recurse-submodules https://github.com/jmcbroome/matreePy
-```
-
-If you forget, you can use 
-
-```
-git submodule update --init
-```
-
-Our key dependencies are handled by conda.
+This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. After cloning this repository, navigate to it and run:
 
 ```
 conda env create -f matreepy.yml
