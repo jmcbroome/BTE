@@ -2,7 +2,6 @@ cimport mat
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 
-
 cdef class MATNode:
     """
     A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.
@@ -61,6 +60,9 @@ cdef class MATree:
         else:
             self.t = mat.Tree()
 
+    cdef assign_tree(self, mat.Tree t):
+        self.t = t
+
     def from_pb(self,file):
         self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
 
@@ -118,3 +120,25 @@ cdef class MATree:
     def rsearch(self,nid,include_self=False):
         return self.rsearch_helper(nid,include_self)
 
+    cdef get_clade_samples(self, string clade_id):
+        '''
+        Return a subtree representing samples just from the selected clade.
+        '''
+        cdef vector[string] samples = mat.get_clade_samples(&self.t, clade_id.encode("UTF-8"))
+        return samples
+
+    cdef get_subtree(self, vector[string] samples):
+        '''
+        Return a subtree representing samples just from the selection.
+        '''
+        cdef mat.Tree subtree = mat.filter_master(self.t, samples, False, True)
+        subt = MATree()
+        subt.assign_tree(subtree)
+        return subt
+
+    def get_clade(self, clade_id):
+        '''
+        Return a subtree representing the selected clade.
+        '''
+        cdef vector[string] samples = self.get_clade_samples(clade_id)
+        return self.get_subtree(samples)
