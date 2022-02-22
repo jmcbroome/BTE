@@ -156,3 +156,21 @@ cdef class MATree:
         '''
         cdef vector[string] samples = self.get_mutation_samples(mutation.encode("UTF-8"))
         return self.get_subtree(samples)
+
+    def count_mutations(self, subroot=""):
+        '''
+        Cython-only function which computes the counts of individual mutation types across the tree. Can take a specific node to start from.
+        '''
+        mcount = {}
+        cdef Node* target_n = self.t.root
+        if subroot != "":
+            target_n = self.t.get_node(subroot.encode("UTF-8"))
+        cdef vector[Node*] nvec = self.t.depth_first_expansion(target_n)
+        for i in range(nvec.size()):
+            for m in nvec[i].mutations:
+                pym = m.get_string().decode("UTF-8")
+                if pym in mcount:
+                    mcount[pym] += 1
+                else:
+                    mcount[pym] = 1
+        return mcount
