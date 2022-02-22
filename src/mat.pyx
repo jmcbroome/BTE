@@ -49,10 +49,10 @@ cdef class MATree:
     """
     cdef mat.Tree t
 
-    def __init__(self, fpath=""):
+    def __init__(self, fpath="", uncondense=True):
         if fpath != "":
             if fpath[-3:] == ".pb" or fpath[-6:] == ".pb.gz":
-                self.from_pb(fpath)
+                self.from_pb(fpath,uncondense)
             elif fpath[-3:] == ".nwk":
                 self.from_newick(fpath)
             else:
@@ -60,14 +60,33 @@ cdef class MATree:
         else:
             self.t = mat.Tree()
 
+    cdef uncondense(self):
+        '''
+        Uncondense the tree.
+        '''
+        self.t.uncondense_leaves()
+
+    cdef condense(self):
+        '''
+        Condense the tree.
+        '''
+        self.t.condense_leaves([])
+
     cdef assign_tree(self, mat.Tree t):
         self.t = t
 
-    def from_pb(self,file):
+    def from_pb(self,file,uncondense=True):
         self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
+        if uncondense:
+            self.uncondense()
 
-    def save_pb(self,file):
+    def save_pb(self,file,condense=True):
+        if condense:
+            self.condense()
         mat.save_mutation_annotated_tree(self.t,file.encode("UTF-8"))
+        #uncondense again afterwards if it was condensed for saving.
+        if condense:
+            self.uncondense()
 
     def from_newick(self,nwk):
         self.t = mat.create_tree_from_newick(nwk.encode("UTF-8"))
@@ -169,8 +188,9 @@ cdef class MATree:
         for i in range(nvec.size()):
             for m in nvec[i].mutations:
                 pym = m.get_string().decode("UTF-8")
-                if pym in mcount:
-                    mcount[pym] += 1
+                pym_type = pym[0] + ">" + pym[-1]
+                if pym_type in mcount:
+                    mcount[pym_type] += 1
                 else:
-                    mcount[pym] = 1
+                    mcount[pym_type] = 1
         return mcount
