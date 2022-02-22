@@ -143,7 +143,7 @@ cdef class MATree:
         '''
         Return samples from the selected clade.
         '''
-        cdef vector[string] samples = mat.get_clade_samples(&self.t, clade_id.encode("UTF-8"))
+        cdef vector[string] samples = mat.get_clade_samples(&self.t, clade_id)
         return samples
 
     cdef get_mutation_samples(self, string mutation):
@@ -166,7 +166,12 @@ cdef class MATree:
         '''
         Return a subtree representing the selected clade.
         '''
+        print("Getting clade: " + clade_id)
         cdef vector[string] samples = self.get_clade_samples(clade_id.encode("UTF-8"))
+        if samples.size() == 0:
+            print("Error: requested clade not found.")
+            return None
+        print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
     def with_mutation(self, mutation):

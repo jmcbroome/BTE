@@ -4,3 +4,5 @@
 src/mat.cpp
 src/parsimony.pb.cc
 src/parsimony.pb.h
+build/*
+build/*.o
