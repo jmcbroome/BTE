@@ -37,10 +37,10 @@ cdef class MATNode:
     def __init__(self):
         self.translations = []
 
-    # property translation:
-    #     #read-only to public.
-    #     def __get__(self):
-    #         return self.translations
+    property translation:
+        #read-only to public.
+        def __get__(self):
+            return self.translations
 
     cdef from_node(self, mat.Node* n):
         '''
@@ -62,7 +62,11 @@ cdef class MATNode:
             assert len(aagenes) == len(nucs)
             for i in range(len(aagenes)):
                 gene, aa = aagenes[i].split(":")
-                aachanges.append(AAChange(gene, aa, nucs[i], codons[i]))
+                #sometimes two adjacent nucleotide mutations contribute to the same amino acid change, making them annoying to store correctly
+                #make a copy of the change in another class object even though there's only one actual amino acid change here. Edge case to keep an eye on.
+                mnucs = nucs[i].split(",")
+                for mn in mnucs:
+                    aachanges.append(AAChange(gene, aa, mn, codons[i]))
             self.translations = aachanges
 
     def is_leaf(self):
@@ -154,50 +158,60 @@ cdef class MATree:
     def get_node(self,name):
         nc = MATNode().from_node(self.t.get_node(name.encode("UTF-8")))
         if len(self.translation_table) > 0:
+            print("Propagating translation.")
             nc.apply_translation(self.translation_table.get(name,""))
         return nc
 
-    cdef dfe_helper(self, mat.Node* node):
+    cdef dfe_helper(self, mat.Node* node, bool get_translation=False):
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.depth_first_expansion(node)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
-            if len(self.translation_table) > 0:
+            if get_translation:
                 nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
 
     def depth_first_expansion(self, nid = ""):
+        hastrans = len(self.translation_table) > 0
+        if hastrans:
+            print("Propagating translations to node search...")
         if nid == "":
-            return self.dfe_helper(self.t.root)
+            return self.dfe_helper(self.t.root,hastrans)
         else:
-            return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")))
+            return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")),hastrans)
 
-    cdef bfe_helper(self, string nid):
+    cdef bfe_helper(self, string nid, bool hastrans):
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
-            if len(self.translation_table) > 0:
+            if hastrans:
                 nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
 
     def breadth_first_expansion(self,nid=""):
-        return self.bfe_helper(nid)
+        hastrans = len(self.translation_table) > 0
+        if hastrans:
+            print("Propagating translations to node search...")
+        return self.bfe_helper(nid,hastrans)
 
     def get_newick_string(self,print_internal=False,print_branch_len=False,retain_original_branch_len=True,uncondense_leaves=False):
         return mat.get_newick_string(self.t,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
 
     cdef rsearch_helper(self, string nid, bool include_self):
+        hastrans = len(self.translation_table) > 0
+        if hastrans:
+            print("Propagating translations to node search...")
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.rsearch(nid.encode("UTF-8"),include_self)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
-            if len(self.translation_table) > 0:
+            if hastrans:
                 nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
