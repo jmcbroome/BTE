@@ -15,7 +15,8 @@ extensions = [Extension("mat",["src/mat.pyx"],
     include_dirs=[CONDA_PREFIX+"/include/google/protobuf", CONDA_PREFIX+"/include/"],
     library_dirs=[CONDA_PREFIX+'/lib/'],
     libraries=['tbb', 'protobuf','boost_system','boost_iostreams'],
-    language='c++'
+    language='c++',
+    extra_compile_args=["-std=c++17"]
     )]  
 
 setup(name='mat',ext_modules=cythonize(extensions,language_level=3))
