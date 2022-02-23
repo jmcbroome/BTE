@@ -3,11 +3,44 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp.utility cimport pair
 
+class AAChange:
+    """
+    Pure python class containing translation information for a specific node's nucleotide mutation. Largely for convenience.
+    """
+    def __init__(self, gene, aa, nuc, codons):
+        self.gene = gene        
+        self.aa = aa
+        self.original_aa = aa[0]
+        self.aa_index = int(aa[1:-1])
+        self.alternative_aa = aa[-1]
+        self.nuc = nuc
+        self.original_nt = nuc[0]
+        self.nt_index = int(nuc[1:-1])
+        self.alternative_nt = nuc[-1]
+        self.mutation_type = nuc[0] + ">" + nuc[-1]
+        self.original_codon = codons.split(">")[0]
+        self.alternative_codon = codons.split(">")[1]
+
+    def is_synonymous(self):
+        if self.original_aa == self.alternative_aa:
+            return True
+        else:
+            return False
+
 cdef class MATNode:
     """
     A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.
     """
     cdef mat.Node* n
+    cdef object translations
+
+    def __init__(self):
+        self.translations = []
+
+    # property translation:
+    #     #read-only to public.
+    #     def __get__(self):
+    #         return self.translations
 
     cdef from_node(self, mat.Node* n):
         '''
@@ -16,6 +49,21 @@ cdef class MATNode:
         to the C++ class attributes.
         '''
         self.n = n
+
+    def apply_translation(self, transtr):
+        '''
+        Store an amino acid translation string as a list attribute containing AAChange objects.
+        '''
+        #do nothing if an empty string is passed.
+        if transtr != "":    
+            aachanges = []
+            #process the transtr in relevant pieces
+            aagenes, nucs, codons = [v.split(";") for v in transtr.split('\t')]
+            assert len(aagenes) == len(nucs)
+            for i in range(len(aagenes)):
+                gene, aa = aagenes[i].split(":")
+                aachanges.append(AAChange(gene, aa, nucs[i], codons[i]))
+            self.translations = aachanges
 
     def is_leaf(self):
         return self.n.is_leaf()
@@ -49,8 +97,16 @@ cdef class MATree:
     ability to traverse from a specified node back to the root node.
     """
     cdef mat.Tree t
+    cdef object translation_table
+
+    property translation_table:
+        def __get__(self):
+            return self.translation_table
+        def __set__(self, value):
+            self.translation_table = value
 
     def __init__(self, fpath="", uncondense=True):
+        self.translation_table = {}
         if fpath != "":
             if fpath[-3:] == ".pb" or fpath[-6:] == ".pb.gz":
                 self.from_pb(fpath,uncondense)
@@ -96,7 +152,10 @@ cdef class MATree:
         return self.t.get_parsimony_score()
 
     def get_node(self,name):
-        return MATNode().from_node(self.t.get_node(name.encode("UTF-8")))
+        nc = MATNode().from_node(self.t.get_node(name.encode("UTF-8")))
+        if len(self.translation_table) > 0:
+            nc.apply_translation(self.translation_table.get(name,""))
+        return nc
 
     cdef dfe_helper(self, mat.Node* node):
         pynvec = []
@@ -104,6 +163,8 @@ cdef class MATree:
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
+            if len(self.translation_table) > 0:
+                nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
 
@@ -119,6 +180,8 @@ cdef class MATree:
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
+            if len(self.translation_table) > 0:
+                nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
 
@@ -134,6 +197,8 @@ cdef class MATree:
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
+            if len(self.translation_table) > 0:
+                nodec.apply_translation(self.translation_table.get(nvec[i].identifier.decode("UTF-8"),""))
             pynvec.append(nodec)
         return pynvec
 
@@ -156,7 +221,7 @@ cdef class MATree:
 
     cdef get_subtree(self, vector[string] samples):
         '''
-        Return a subtree representing samples just from the selection.
+        Return a subtree representing samples just from the selection. Does not retain translations computed on the original tree.
         '''
         cdef mat.Tree subtree = mat.filter_master(self.t, samples, False, True)
         subt = MATree()
@@ -201,12 +266,10 @@ cdef class MATree:
                     mcount[pym_type] = 1
         return mcount
 
-    def translate_tree(self,gtf_file,fasta_file):
+    def translate(self,gtf_file,fasta_file):
         """
         Translate amino acid changes across the tree and return the results as a dictionary of node IDs and change strings as returned from matUtils translate. 
         """
         cdef vector[pair[string,string]] changes = mat.do_translation(&self.t,gtf_file.encode("UTF-8"),fasta_file.encode("UTF-8"))
-        simple_translation = {}
         for i in range(changes.size()):
-            simple_translation[changes[i].first.decode("UTF-8")] = changes[i].second.decode("UTF-8")
-        return simple_translation
+            self.translation_table[changes[i].first.decode("UTF-8")] = changes[i].second.decode("UTF-8")
