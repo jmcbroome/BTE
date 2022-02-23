@@ -1,6 +1,7 @@
 cimport mat
 from libcpp.vector cimport vector
 from libcpp.string cimport string
+from libcpp.utility cimport pair
 
 cdef class MATNode:
     """
@@ -199,3 +200,13 @@ cdef class MATree:
                 else:
                     mcount[pym_type] = 1
         return mcount
+
+    def translate_tree(self,gtf_file,fasta_file):
+        """
+        Translate amino acid changes across the tree and return the results as a dictionary of node IDs and change strings as returned from matUtils translate. 
+        """
+        cdef vector[pair[string,string]] changes = mat.do_translation(&self.t,gtf_file.encode("UTF-8"),fasta_file.encode("UTF-8"))
+        simple_translation = {}
+        for i in range(changes.size()):
+            simple_translation[changes[i].first.decode("UTF-8")] = changes[i].second.decode("UTF-8")
+        return simple_translation

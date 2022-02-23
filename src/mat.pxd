@@ -1,5 +1,6 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.utility cimport pair
 from libcpp cimport bool
 from stringstream cimport stringstream
 
@@ -104,3 +105,5 @@ cdef extern from "matUtils/select.cpp":
     vector[string] get_mutation_samples(Tree* T, string mutation_id)
 cdef extern from "matUtils/filter.cpp":
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
+cdef extern from "matUtils/translate.cpp":
+    vector[pair[string,string]] do_translation(Tree* T, string gtf_file, string fasta_file)
