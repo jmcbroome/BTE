@@ -156,7 +156,8 @@ cdef class MATree:
         return self.t.get_parsimony_score()
 
     def get_node(self,name):
-        nc = MATNode().from_node(self.t.get_node(name.encode("UTF-8")))
+        nc = MATNode()
+        nc.from_node(self.t.get_node(name.encode("UTF-8")))
         if len(self.translation_table) > 0:
             print("Propagating translation.")
             nc.apply_translation(self.translation_table.get(name,""))
