@@ -159,7 +159,7 @@ cdef class MATree:
         nc = MATNode()
         nc.from_node(self.t.get_node(name.encode("UTF-8")))
         if len(self.translation_table) > 0:
-            print("Propagating translation.")
+            #print("Propagating translation.")
             nc.apply_translation(self.translation_table.get(name,""))
         return nc
 
@@ -176,8 +176,8 @@ cdef class MATree:
 
     def depth_first_expansion(self, nid = ""):
         hastrans = len(self.translation_table) > 0
-        if hastrans:
-            print("Propagating translations to node search...")
+        #if hastrans:
+            #print("Propagating translations to node search...")
         if nid == "":
             return self.dfe_helper(self.t.root,hastrans)
         else:
@@ -196,8 +196,8 @@ cdef class MATree:
 
     def breadth_first_expansion(self,nid=""):
         hastrans = len(self.translation_table) > 0
-        if hastrans:
-            print("Propagating translations to node search...")
+        #if hastrans:
+        #    print("Propagating translations to node search...")
         return self.bfe_helper(nid,hastrans)
 
     def get_newick_string(self,print_internal=False,print_branch_len=False,retain_original_branch_len=True,uncondense_leaves=False):
@@ -205,8 +205,8 @@ cdef class MATree:
 
     cdef rsearch_helper(self, string nid, bool include_self):
         hastrans = len(self.translation_table) > 0
-        if hastrans:
-            print("Propagating translations to node search...")
+        #if hastrans:
+        #    print("Propagating translations to node search...")
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.rsearch(nid.encode("UTF-8"),include_self)
         for i in range(nvec.size()):
@@ -280,6 +280,12 @@ cdef class MATree:
                 else:
                     mcount[pym_type] = 1
         return mcount
+
+    def count_leaves(self, subroot = ""):
+        cdef Node* target_n = self.t.root
+        if subroot != "":
+            target_n = self.t.get_node(subroot.encode("UTF-8"))
+        return self.t.get_num_leaves(target_n)
 
     def translate(self,gtf_file,fasta_file):
         """
