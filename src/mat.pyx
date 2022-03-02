@@ -95,7 +95,8 @@ cdef class MATree:
         return self.t.get_parsimony_score()
 
     def get_node(self,name):
-        return MATNode().from_node(self.t.get_node(name.encode("UTF-8")))
+        nc = MATNode()
+        nc.from_node(self.t.get_node(name.encode("UTF-8")))
 
     cdef dfe_helper(self, mat.Node* node):
         pynvec = []
@@ -199,3 +200,9 @@ cdef class MATree:
                 else:
                     mcount[pym_type] = 1
         return mcount
+
+    def count_leaves(self, subroot = ""):
+        cdef Node* target_n = self.t.root
+        if subroot != "":
+            target_n = self.t.get_node(subroot.encode("UTF-8"))
+        return self.t.get_num_leaves(target_n)
