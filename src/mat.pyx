@@ -175,6 +175,23 @@ cdef class MATree:
         print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
+    cdef get_regex_match(self, string regexstr):
+        '''
+        Return a subtree containing all samples matching the regular expression.
+        '''
+        #the C++ allows for a preselection of samples, but we don't use that option.
+        cdef vector[string] to_check = []
+        cdef vector[string] samples = mat.get_sample_match(&self.t, to_check, regexstr)
+        return samples
+    
+    def get_regex(self, regexstr):
+        cdef samples = self.get_regex_match(regexstr.encode("UTF-8"))
+        if samples.size() == 0:
+            print("Error: requested regex does not match any samples.")
+            return None
+        print("Successfully found {} samples.".format(len(samples)))
+        return self.get_subtree(samples)
+
     def with_mutation(self, mutation):
         '''
         Return a subtree of samples containing the indicated mutation.

@@ -102,5 +102,6 @@ cdef extern from "matUtils/common.hpp":
 cdef extern from "matUtils/select.cpp":
     vector[string] get_clade_samples(Tree* T, string clade_name)
     vector[string] get_mutation_samples(Tree* T, string mutation_id)
+    vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
 cdef extern from "matUtils/filter.cpp":
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
