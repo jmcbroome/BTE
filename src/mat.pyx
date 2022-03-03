@@ -168,6 +168,10 @@ cdef class MATree:
         subt = MATree()
         subt.assign_tree(subtree)
         return subt
+    
+    def subtree(self, samples):
+        cdef vector[string] samples_vec = [s.encode("UTF-8") for s in samples]
+        return self.get_subtree(samples_vec)
 
     def get_clade(self, clade_id):
         '''
