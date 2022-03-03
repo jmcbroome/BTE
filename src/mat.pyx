@@ -1,6 +1,7 @@
 cimport mat
 from libcpp.vector cimport vector
 from libcpp.string cimport string
+from libcpp.set cimport set as cset
 
 cdef class MATNode:
     """
@@ -185,7 +186,7 @@ cdef class MATree:
         return samples
     
     def get_regex(self, regexstr):
-        cdef samples = self.get_regex_match(regexstr.encode("UTF-8"))
+        cdef vector[string] samples = self.get_regex_match(regexstr.encode("UTF-8"))
         if samples.size() == 0:
             print("Error: requested regex does not match any samples.")
             return None
@@ -223,3 +224,57 @@ cdef class MATree:
         if subroot != "":
             target_n = self.t.get_node(subroot.encode("UTF-8"))
         return self.t.get_num_leaves(target_n)
+
+    cdef accumulate_mutations(self, string sample):
+        '''
+        Return the set of mutations the indicated sample has with respect to the root. 
+        '''
+        cdef vector[Node*] ancestors = self.t.rsearch(sample, True)
+        allm = set()
+        for i in range(ancestors.size()):
+            #proceed in reverse order e.g. root to sample.
+            for m in ancestors[ancestors.size()-i-1].mutations:
+                #check that the opposite of this mutation is not in the set
+                #if it is, instead delete it and skip this entry (as they negate each other with respect to the sample's final genome)
+                mname = m.get_string().decode("UTF-8")
+                oppo = mname[-1] + mname[1:-1] + mname[0]
+                if oppo in allm:
+                    allm.remove(oppo)
+                else:
+                    allm.add(mname)
+        return allm
+
+    def count_haplotypes(self):
+        '''
+        Return a dictionary of unique haplotypes and their counts. Used for nucleotide diversity estimates.
+        '''
+        cdef vector[string] samples = self.t.get_leaves_ids("".encode("UTF-8"))
+        divtrack = {}
+        for i in range(samples.size()):
+            smset = self.accumulate_mutations(samples[i])
+            smkey = tuple(sorted(list(smset)))
+            if smkey not in divtrack:
+                divtrack[smkey] = 0
+            divtrack[smkey] += 1
+        return divtrack
+
+    def compute_nucleotide_diversity(self):
+        '''
+        Cython-only function which computes the nucleotide diversity of the tree.
+        This is defined as the mean number of pairwise differences in nucleotides between any two leaves
+        of the tree. 
+        '''
+        #compute the set of mutations belonging to each sample in the tree, then compute pi from the resulting frequencies
+        #since each sample is individually rsearched, this implementation is less efficient than an informed traversal, but still fast enough for most purposes.
+        divtrack = self.count_haplotypes()
+        total_seq = sum(divtrack.values())
+        div = 0
+        for g1 in divtrack.keys():
+            g1_freq = divtrack[g1] / total_seq
+            for g2 in divtrack.keys():
+                if g1 != g2:
+                    g2_freq = divtrack[g2] / total_seq
+                    pair_diff = len(set(g1).symmetric_difference(set(g2)))
+                    div += pair_diff * g1_freq * g2_freq
+        #multiply the final result to guarantee an unbiased estimator (see wikipedia entry?)
+        return div * (total_seq / (total_seq - 1))
