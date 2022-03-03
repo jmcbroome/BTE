@@ -99,6 +99,11 @@ cdef class MATree:
         nc = MATNode()
         nc.from_node(self.t.get_node(name.encode("UTF-8")))
 
+    def get_internal_node_descendents(self, name=""):
+        cdef vector[string] all_desc = self.t.get_leaves_ids(name.encode("UTF-8"))
+        for i in range(all_desc.size()):
+            yield all_desc[i].decode("UTF-8")
+
     cdef dfe_helper(self, mat.Node* node):
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.depth_first_expansion(node)
