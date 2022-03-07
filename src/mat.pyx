@@ -98,6 +98,7 @@ cdef class MATree:
     def get_node(self,name):
         nc = MATNode()
         nc.from_node(self.t.get_node(name.encode("UTF-8")))
+        return nc
 
     def get_internal_node_descendents(self, name=""):
         cdef vector[string] all_desc = self.t.get_leaves_ids(name.encode("UTF-8"))
@@ -136,7 +137,7 @@ cdef class MATree:
 
     cdef rsearch_helper(self, string nid, bool include_self):
         pynvec = []
-        cdef vector[mat.Node*] nvec = self.t.rsearch(nid.encode("UTF-8"),include_self)
+        cdef vector[mat.Node*] nvec = self.t.rsearch(nid,include_self)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -144,7 +145,7 @@ cdef class MATree:
         return pynvec
 
     def rsearch(self,nid,include_self=False):
-        return self.rsearch_helper(nid,include_self)
+        return self.rsearch_helper(nid.encode("UTF-8"),include_self)
 
     cdef get_clade_samples(self, string clade_id):
         '''
@@ -261,7 +262,7 @@ cdef class MATree:
         divtrack = {}
         for i in range(samples.size()):
             smset = self.accumulate_mutations(samples[i])
-            smkey = tuple(sorted(list(smset)))
+            smkey = tuple(sorted(smset))
             if smkey not in divtrack:
                 divtrack[smkey] = 0
             divtrack[smkey] += 1
@@ -273,6 +274,13 @@ cdef class MATree:
         This is defined as the mean number of pairwise differences in nucleotides between any two leaves
         of the tree. 
         '''
+        def count_differences(l1,l2):
+            total_matched = 0
+            sl2 = set(l2)
+            for element in l1:
+                if element in sl2:
+                    total_matched += 1
+            return (len(l1)-total_matched) + (len(l2)-total_matched)
         #compute the set of mutations belonging to each sample in the tree, then compute pi from the resulting frequencies
         #since each sample is individually rsearched, this implementation is less efficient than an informed traversal, but still fast enough for most purposes.
         divtrack = self.count_haplotypes()
@@ -283,7 +291,8 @@ cdef class MATree:
             for g2 in divtrack.keys():
                 if g1 != g2:
                     g2_freq = divtrack[g2] / total_seq
-                    pair_diff = len(set(g1).symmetric_difference(set(g2)))
+                    #pair_diff = len(set(g1).symmetric_difference(set(g2)))
+                    pair_diff = count_differences(g1,g2)
                     div += pair_diff * g1_freq * g2_freq
         #multiply the final result to guarantee an unbiased estimator (see wikipedia entry?)
         return div * (total_seq / (total_seq - 1))
