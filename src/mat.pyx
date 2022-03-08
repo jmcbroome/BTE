@@ -158,7 +158,7 @@ cdef class MATree:
         '''
         Return samples containing the selected mutation.
         '''
-        cdef vector[string] samples = mat.get_mutation_samples(&self.t, mutation.encode("UTF-8"))
+        cdef vector[string] samples = mat.get_mutation_samples(&self.t, mutation)
         return samples
 
     cdef get_subtree(self, vector[string] samples):
