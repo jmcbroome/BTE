@@ -76,6 +76,9 @@ cdef class MATree:
     cdef assign_tree(self, mat.Tree t):
         self.t = t
 
+    cdef resolve_all_polytomies(self):
+        self.t = resolve_all_polytomies(self.t)
+
     def from_pb(self,file,uncondense=True):
         self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
         if uncondense:
@@ -296,3 +299,29 @@ cdef class MATree:
                     div += pair_diff * g1_freq * g2_freq
         #multiply the final result to guarantee an unbiased estimator (see wikipedia entry?)
         return div * (total_seq / (total_seq - 1))
+
+    def simple_parsimony(self, node_assignments):
+        '''
+        This function is an implementation of the small parsimony problem (Fitch algorithm) for a single set of states.
+        It takes as input a dictionary mapping leaf names to character states and returns a dictionary mapping both leaf and internal node names to inferred character states.
+        '''
+        #this algorithm traverses the tree in postorder (reverse depth-first)
+        #it requires that the tree be fully resolved and bifurcating, so that's the first step.
+        self.resolve_all_polytomies()
+        node_assignment_set = {}
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        cdef Node* cnode
+        cdef vector[Node*] children
+        for i in range(nodes.size()):
+            cnode = nodes[nodes.size()-i-1]
+            if not cnode.is_leaf():
+                #if it is correctly resolved, this node will have exactly two children.
+                children = cnode.children
+                assert children.size() == 2
+                left = node_assignment_set[children[0].identifier.decode("UTF-8")]
+                right = node_assignment_set[children[1].identifier.decode("UTF-8")]
+                state = left & right
+                if not state:
+                    state = left | right
+                node_assignment_set[cnode.identifier.decode("UTF-8")] = state
+        return node_assignment_set

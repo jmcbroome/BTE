@@ -105,3 +105,4 @@ cdef extern from "matUtils/select.cpp":
     vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
 cdef extern from "matUtils/filter.cpp":
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
+    Tree resolve_all_polytomies(Tree T)
