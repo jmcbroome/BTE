@@ -9,11 +9,11 @@ nodes = t.depth_first_expansion()
 print("{} nodes traversed.".format(len(nodes)))
 print("Checking the tenth node...")
 testnode = nodes[9]
-print("Name:",testnode.get_id())
-children = testnode.get_children()
+print("Name:",testnode.id)
+children = testnode.children
 print("{} children.".format(len(children)))
-parent = testnode.get_parent()
-print("Parent:",parent.get_id())
-mutations = testnode.get_mutations()
+parent = testnode.parent
+print("Parent:",parent.id)
+mutations = testnode.mutations
 print("Mutations: ",mutations)
 print("Done!")
