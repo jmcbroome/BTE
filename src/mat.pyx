@@ -9,17 +9,14 @@ cdef class MATNode:
     """
     cdef mat.Node* n
 
-    def __init__(self, mat.Node* n):
-        self.n = n
-
-    @classmethod
-    cdef from_node(cls,mat.Node* n):
+    cdef from_node(self,mat.Node* n):
         '''
         Load a node object from a MAT node. Attributes specific to the node such as mutations and identifier
         will be loaded automatically into python attributes and relational attributes to other nodes can be accessed through fetch methods 
         to the C++ class attributes.
         '''
-        return cls(n)
+        self.n = n
+        return self
 
     def is_leaf(self):
         return self.n.is_leaf()
