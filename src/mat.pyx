@@ -9,26 +9,33 @@ cdef class MATNode:
     """
     cdef mat.Node* n
 
-    cdef from_node(self, mat.Node* n):
+    def __init__(self, mat.Node* n):
+        self.n = n
+
+    @classmethod
+    cdef from_node(cls,mat.Node* n):
         '''
         Load a node object from a MAT node. Attributes specific to the node such as mutations and identifier
         will be loaded automatically into python attributes and relational attributes to other nodes can be accessed through fetch methods 
         to the C++ class attributes.
         '''
-        self.n = n
+        return cls(n)
 
     def is_leaf(self):
         return self.n.is_leaf()
 
-    def get_id(self):
+    @property
+    def id(self):
         return self.n.identifier.decode("UTF-8")
 
-    def get_parent(self):
+    @property
+    def parent(self):
         pn = MATNode()
         pn.from_node(self.n.parent)
         return pn
 
-    def get_children(self):
+    @property
+    def children(self):
         cnv = []
         for n in self.n.children:
             cn = MATNode()
@@ -36,10 +43,12 @@ cdef class MATNode:
             cnv.append(cn)
         return cnv
 
-    def get_mutations(self):
+    @property
+    def mutations(self):
         return [m.get_string().decode("UTF-8") for m in self.n.mutations]
 
-    def get_annotations(self):
+    @property
+    def annotations(self):
         return [m.decode("UTF-8") for m in self.n.clade_annotations]
 
 cdef class MATree:
@@ -325,3 +334,10 @@ cdef class MATree:
                     state = left | right
                 node_assignment_set[cnode.identifier.decode("UTF-8")] = state
         return node_assignment_set
+
+    def ladderize(self):
+        '''
+        Sort the branches of the tree according to the size of each partition.
+        '''
+        self.t.rotate_for_consistency()
+
