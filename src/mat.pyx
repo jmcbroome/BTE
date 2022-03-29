@@ -2,6 +2,8 @@ cimport mat
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp.set cimport set as cset
+from libcpp.map cimport map
+from libc.stdint cimport *
 
 cdef class MATNode:
     """
@@ -47,6 +49,18 @@ cdef class MATNode:
     @property
     def annotations(self):
         return [m.decode("UTF-8") for m in self.n.clade_annotations]
+
+cdef complement(int8_t input):
+    if input == 0b1:
+        return 0b1000
+    elif input == 0b1000:
+        return 0b1
+    elif input == 0b10:
+        return 0b100
+    elif input == 0b100:
+        return 0b10
+    else:
+        return input
 
 cdef class MATree:
     """
@@ -306,7 +320,7 @@ cdef class MATree:
         #multiply the final result to guarantee an unbiased estimator (see wikipedia entry?)
         return div * (total_seq / (total_seq - 1))
 
-    def simple_parsimony(self, node_assignments):
+    def simple_parsimony(self, leaf_assignments):
         '''
         This function is an implementation of the small parsimony problem (Fitch algorithm) for a single set of states.
         It takes as input a dictionary mapping leaf names to character states and returns a dictionary mapping both leaf and internal node names to inferred character states.
@@ -314,7 +328,8 @@ cdef class MATree:
         #this algorithm traverses the tree in postorder (reverse depth-first)
         #it requires that the tree be fully resolved and bifurcating, so that's the first step.
         self.resolve_all_polytomies()
-        node_assignment_set = {}
+        #initialize node assignments with leaf states
+        node_assignment_set = {l:{v} for l,v in leaf_assignments.items()}
         cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
         cdef Node* cnode
         cdef vector[Node*] children
@@ -338,3 +353,23 @@ cdef class MATree:
         '''
         self.t.rotate_for_consistency()
 
+    def reverse_strand(self, genome_size = 29903):
+        '''
+        Inverts the tree representation of mutations such that all mutations are with respect to the reverse strand of the reference.
+        All bases are complemented and indeces are reversed. The tree structure itself and parsimony scores are unaffected.
+        '''
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        cdef vector[Mutation] nmv 
+        cdef Mutation newmut
+        for i in range(nodes.size()):
+            nmv.clear()
+            for mutation in nodes[i].mutations:
+                newmut = mutation.copy()
+                newmut.ref_nuc = complement(mutation.ref_nuc)
+                newmut.par_nuc = complement(mutation.par_nuc)
+                newmut.mut_nuc = complement(mutation.mut_nuc)
+                newmut.position = genome_size - mutation.position - 1
+                nmv.push_back(newmut)
+            #since nodes[i] is a pointer to the original node object, we can simply edit it inplace.
+            nodes[i].mutations = nmv
+        
