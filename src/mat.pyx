@@ -151,6 +151,13 @@ cdef class MATree:
             wrappers.append(nodec)
         return wrappers
 
+    def get_leaves_ids(self, nid = ""):
+        cdef vector[string] leaves = self.t.get_leaves_ids(nid.encode("UTF-8"))
+        names = []
+        for i in range(leaves.size()):
+            names.append(leaves[i].decode("UTF-8"))
+        return names
+
     cdef bfe_helper(self, string nid):
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
