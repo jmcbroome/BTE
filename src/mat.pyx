@@ -143,6 +143,14 @@ cdef class MATree:
         else:
             return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")))
 
+    def get_leaves(self, nid = ""):
+        cdef vector[Node*] leaves = self.t.get_leaves(nid.encode("UTF-8"))
+        wrappers = []
+        for i in range(leaves.size()):
+            nodec = MATNode().from_node(leaves[i])
+            wrappers.append(nodec)
+        return wrappers
+
     cdef bfe_helper(self, string nid):
         pynvec = []
         cdef vector[mat.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
