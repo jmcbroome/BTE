@@ -367,7 +367,7 @@ cdef class MATree:
                 node_assignment_set[cnode.identifier.decode("UTF-8")] = state
         #we then traverse again through the same sets of nodes in preorder/depth-first, finalizing character states based on 
         #the state of the parent.
-        assert node_assignment_set.size() == nodes.size()
+        assert len(node_assignment_set) == nodes.size()
         final_node_assignment = {}
         cdef Node* parent
         for i in range(nodes.size()):
