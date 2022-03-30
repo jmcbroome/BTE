@@ -342,9 +342,14 @@ cdef class MATree:
         '''
         #this algorithm traverses the tree in postorder (reverse depth-first)
         #it requires that the tree be fully resolved and bifurcating, so that's the first step.
+        #note on efficiency- we're using Python dicts to do most of the set logic, which are slower than using native C++ objects
+        print("Resolving polytomies...")
         self.resolve_all_polytomies()
         #initialize node assignments with leaf states
-        node_assignment_set = {l:{v} for l,v in leaf_assignments.items()}
+        node_assignment_set = {l:set(v) for l,v in leaf_assignments.items()}
+        print("{} initial assignments".format(len(node_assignment_set)))
+        #first, a postorder traversal. We implement this here by generating nodes in depth-first order and proceeding 
+        #to iterate through their indeces in reverse.
         cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
         cdef Node* cnode
         cdef vector[Node*] children
@@ -360,7 +365,30 @@ cdef class MATree:
                 if not state:
                     state = left | right
                 node_assignment_set[cnode.identifier.decode("UTF-8")] = state
-        return node_assignment_set
+        #we then traverse again through the same sets of nodes in preorder/depth-first, finalizing character states based on 
+        #the state of the parent.
+        assert node_assignment_set.size() == nodes.size()
+        final_node_assignment = {}
+        cdef Node* parent
+        for i in range(nodes.size()):
+            cnode = nodes[i]
+            if not cnode.is_leaf():
+                current_state = node_assignment_set[cnode.identifier.decode("UTF-8")]
+                if len(current_state) == 1:
+                    final_node_assignment[cnode.identifier.decode("UTF-8")] = list(current_state)[0]
+                elif cnode.is_root():
+                    final_node_assignment[cnode.identifier.decode("UTF-8")] = '0'
+                else:
+                    parent = cnode.parent
+                    #in depth-first, this should always be accessible.
+                    parent_state = final_node_assignment[parent.identifier.decode("UTF-8")]
+                    if parent_state not in current_state:
+                        #if the parent state is not part of the multiple options for this node, just take the first one.
+                        final_node_assignment[cnode.identifier.decode("UTF-8")] = list(current_state)[0]
+                    else:
+                        final_node_assignment[cnode.identifier.decode("UTF-8")] = parent_state
+        print("{} final assignments".format(len(final_node_assignment)))
+        return final_node_assignment
 
     def ladderize(self):
         '''
