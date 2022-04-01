@@ -24,6 +24,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate base
           conda upgrade -c conda-forge --all
+          conda install -c conda-forge tbb-devel=2019.0
           python3 setup.py build_ext --inplace
 
       # assert that the compiled library is importable
