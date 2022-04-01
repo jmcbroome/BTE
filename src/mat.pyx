@@ -123,6 +123,11 @@ cdef class MATree:
         nc.from_node(self.t.get_node(name.encode("UTF-8")))
         return nc
 
+    def get_root(self):
+        nc = MATNode()
+        nc.from_node(self.t.root)
+        return nc
+
     def get_internal_node_descendents(self, name=""):
         cdef vector[string] all_desc = self.t.get_leaves_ids(name.encode("UTF-8"))
         for i in range(all_desc.size()):
