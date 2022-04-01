@@ -13,12 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      #install the environment and all dependencies
+      #install the environment and all dependencies then build the extension
       - name: install env
-        run: $CONDA/bin/conda env update --file bte.yml --name base
-      # compile the extension
-      - name: build_ext
-        run: python3 setup.py build_ext --inplace
+        run: | 
+          $CONDA/bin/conda env update --file bte.yml --name base
+          python3 setup.py build_ext --inplace
 
       # assert that the compiled library is importable
       - name: import test
