@@ -1,5 +1,6 @@
 name: bte
 channels:
+  - defaults
   - conda-forge
   - anaconda
 dependencies:
