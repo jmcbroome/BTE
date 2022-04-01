@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       #install the environment and all dependencies then build the extension
       - name: install env
-        run:|
+        run: |
           $CONDA/bin/conda env update --file bte.yml --name base
           #source $(conda info --base)/etc/profile.d/conda.sh
           eval "$(conda shell.bash hook)"
