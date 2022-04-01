@@ -9,7 +9,8 @@ if CONDA_PREFIX == None:
     exit(1)
 
 #build the matree protoc reader files for this system and put them in the src
-subprocess.run("protoc --cpp_out=./src parsimony.proto",shell=True,check=True)
+subprocess.run("protoc --cpp_out=../ parsimony.proto",shell=True,check=True,cwd='src/usher')
+subprocess.run("protoc --cpp_out=../ taxodium.proto",shell=True,check=True,cwd='src/usher')
 
 extensions = [Extension("mat",["src/mat.pyx"],
     include_dirs=[CONDA_PREFIX+"/include/google/protobuf", CONDA_PREFIX+"/include/"],

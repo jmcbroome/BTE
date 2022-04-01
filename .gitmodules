@@ -1,0 +1,3 @@
+[submodule "src/usher"]
+	path = src/usher
+	url = https://github.com/yatisht/usher

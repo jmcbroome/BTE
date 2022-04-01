@@ -2,8 +2,8 @@
 *.pb.gz
 *.so
 src/mat.cpp
-src/parsimony.pb.cc
-src/parsimony.pb.h
+src/*.pb.cc
+src/*.pb.h
 build/*
 build/*.o
 .ipynb_checkpoints

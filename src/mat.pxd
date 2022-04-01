@@ -3,7 +3,7 @@ from libcpp.vector cimport vector
 from libcpp cimport bool
 from stringstream cimport stringstream
 
-cdef extern from "mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
+cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
     struct Missing_Sample:
         pass
     struct Mutation:
@@ -87,22 +87,22 @@ cdef extern from "mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tre
     void clear_tree(Tree tree)
 
     void read_vcf (Tree* T, string vcf_filename, vector[Missing_Sample] missing_samples, bool create_new_mat)
-cdef extern from "mutation_annotated_tree.cpp":
+cdef extern from "usher/src/mutation_annotated_tree.cpp":
     pass
-cdef extern from "usher_graph.hpp":
+cdef extern from "usher/src/usher_graph.hpp":
     pass
-cdef extern from "usher_mapper.cpp":
+cdef extern from "usher/src/usher_mapper.cpp":
     pass
 cdef extern from "parsimony.pb.h":
     pass
 cdef extern from "parsimony.pb.cc":
     pass
-cdef extern from "matUtils/common.hpp":
+cdef extern from "usher/src/matUtils/common.hpp":
     pass
-cdef extern from "matUtils/select.cpp":
+cdef extern from "usher/src/matUtils/select.cpp":
     vector[string] get_clade_samples(Tree* T, string clade_name)
     vector[string] get_mutation_samples(Tree* T, string mutation_id)
     vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
-cdef extern from "matUtils/filter.cpp":
+cdef extern from "usher/src/matUtils/filter.cpp":
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
     Tree resolve_all_polytomies(Tree T)
