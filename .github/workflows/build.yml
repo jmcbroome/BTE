@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      #install the environment and all dependencies
+      - name: install env
+        run: | 
+          conda create env -f bte.yml
+          conda activate bte
       # compile the extension
       - name: build_ext
         run: python3 setup.py build_ext --inplace
