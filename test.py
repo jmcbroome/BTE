@@ -1,6 +1,6 @@
-import bte
+import mat
 print("Loading tree...")
-t = bte.MATree("public-latest.all.masked.pb.gz")
+t = mat.MATree("public-latest.all.masked.pb.gz")
 print("Tree successfully loaded.")
 parsimony = t.get_parsimony_score()
 print("Parsimony score:", parsimony)
