@@ -16,7 +16,7 @@ jobs:
       #install the environment and all dependencies
       - name: install env
         run: | 
-          conda create env -f bte.yml
+          conda create env -f ./bte.yml
           conda activate bte
       # compile the extension
       - name: build_ext
