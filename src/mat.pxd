@@ -90,7 +90,9 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
 cdef extern from "usher/src/mutation_annotated_tree.cpp":
     pass
 cdef extern from "usher/src/usher_graph.hpp":
-    pass
+    cppclass Timer:
+        void Start()
+        long Stop()
 cdef extern from "usher/src/usher_mapper.cpp":
     pass
 cdef extern from "parsimony.pb.h":
@@ -98,6 +100,9 @@ cdef extern from "parsimony.pb.h":
 cdef extern from "parsimony.pb.cc":
     pass
 cdef extern from "usher/src/matUtils/common.hpp":
+    pass
+#cython really does not like declaring global variables as extern in headers, so deliberately write and link a declaration in its own file.
+cdef extern from "timer.cpp":
     pass
 cdef extern from "usher/src/matUtils/select.cpp":
     vector[string] get_clade_samples(Tree* T, string clade_name)
