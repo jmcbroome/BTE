@@ -29,7 +29,22 @@ If you don't have make/cmake, clang/gcc and related available.
 
 ### First Time Setup
 
-This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. After cloning this repository, navigate to it and run:
+This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. 
+
+The first step is to clone this repository. This repository relies on UShER as a submodule dependency, so --recurse-submodules
+needs to be added to the call.
+
+```
+git clone --recurse-submodules https://github.com/jmcbroome/matreePy 
+```
+
+If you forgot to add this argument to your git clone call, you can run the following in the cloned repository.
+
+```
+git submodule update --init
+```
+
+The next step is to prepare the environment and all relevant dependencies.
 
 ```
 conda env create -f matreepy.yml
@@ -46,6 +61,7 @@ conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=201
 ### Building the Python-importable library
 
 Once all libraries are available, proceed to compile the .so.
+
 ```
 python3 setup.py build_ext --inplace
 ```
