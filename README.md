@@ -1,4 +1,4 @@
-# matreePy
+# BTE
 Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher) (In Early Development). Developer version distributed as source. 
 
 # Overview
@@ -35,7 +35,7 @@ The first step is to clone this repository. This repository relies on UShER as a
 needs to be added to the call.
 
 ```
-git clone --recurse-submodules https://github.com/jmcbroome/matreePy 
+git clone --recurse-submodules https://github.com/jmcbroome/BTE
 ```
 
 If you forgot to add this argument to your git clone call, you can run the following in the cloned repository.
@@ -47,14 +47,14 @@ git submodule update --init
 The next step is to prepare the environment and all relevant dependencies.
 
 ```
-conda env create -f matreepy.yml
+conda env create -f bte.yml
 ```
 
 If the .yml isn't working for you, you can try:
 
 ```
-conda create --name matreepy
-conda activate matreepy
+conda create --name bte
+conda activate bte
 conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=2019.0
 ```
 

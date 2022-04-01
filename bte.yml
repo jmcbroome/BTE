@@ -1,4 +1,4 @@
-name: matreepy
+name: bte
 channels:
   - defaults
 dependencies:
@@ -9,4 +9,4 @@ dependencies:
   - autoconf
   - protobuf=3.19
   - tbb-devel=2019.0
-prefix: /Users/jmcbr/opt/anaconda3/envs/matreepy
+prefix: /Users/jmcbr/opt/anaconda3/envs/bte
