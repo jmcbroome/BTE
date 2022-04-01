@@ -17,7 +17,7 @@ jobs:
       - name: fetch usher
         run: |
           git pull --recurse-submodules
-          git submodule update --remote --recursive
+          git submodule update --init
       - name: install env
         run: |
           $CONDA/bin/conda env update --file bte.yml --name base
