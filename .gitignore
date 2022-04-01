@@ -9,3 +9,5 @@ build/*.o
 .ipynb_checkpoints
 *.tsv*
 *.csv*
+*txt
+*Viral*

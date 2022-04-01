@@ -8,7 +8,7 @@ if CONDA_PREFIX == None:
     print("Can't find conda installation- aborting.")
     exit(1)
 
-#build the matree protoc reader files for this system and put them in the src
+#build the protoc reader files for this system and put them in the src
 subprocess.run("protoc --cpp_out=../ parsimony.proto",shell=True,check=True,cwd='src/usher')
 subprocess.run("protoc --cpp_out=../ taxodium.proto",shell=True,check=True,cwd='src/usher')
 
@@ -18,6 +18,6 @@ extensions = [Extension("mat",["src/mat.pyx"],
     libraries=['tbb', 'protobuf','boost_system','boost_iostreams'],
     language='c++',
     extra_compile_args=["-std=c++17"]
-    )]  
+    )]
 
 setup(name='mat',ext_modules=cythonize(extensions,language_level=3))
