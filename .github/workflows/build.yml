@@ -24,7 +24,4 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate base
           python3 setup.py build_ext --inplace
-
-      # assert that the compiled library is importable
-      - name: import test
-        run: python3 -c "import mat"
+          python3 -c "import mat"
