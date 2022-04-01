@@ -17,6 +17,7 @@ jobs:
       - name: install env
         run: | 
           $CONDA/bin/conda env update --file bte.yml --name base
+          $conda/bin/conda activate base
           python3 setup.py build_ext --inplace
 
       # assert that the compiled library is importable
