@@ -23,6 +23,7 @@ jobs:
           $CONDA/bin/conda env update --file bte.yml --name base
           eval "$(conda shell.bash hook)"
           conda activate base
+          conda upgrade -c conda-forge --all
           python3 setup.py build_ext --inplace
 
       # assert that the compiled library is importable
