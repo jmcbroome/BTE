@@ -12,7 +12,7 @@ if CONDA_PREFIX == None:
 subprocess.run("protoc --cpp_out=../ parsimony.proto",shell=True,check=True,cwd='src/usher')
 subprocess.run("protoc --cpp_out=../ taxodium.proto",shell=True,check=True,cwd='src/usher')
 
-extensions = [Extension("mat",["src/mat.pyx"],
+extensions = [Extension("bte",["src/bte.pyx"],
     include_dirs=[CONDA_PREFIX+"/include/google/protobuf", CONDA_PREFIX+"/include/"],
     library_dirs=[CONDA_PREFIX+'/lib/'],
     libraries=['tbb', 'protobuf','boost_system','boost_iostreams'],
@@ -20,4 +20,4 @@ extensions = [Extension("mat",["src/mat.pyx"],
     extra_compile_args=["-std=c++17"]
     )]
 
-setup(name='mat',ext_modules=cythonize(extensions,language_level=3))
+setup(name='bte',ext_modules=cythonize(extensions,language_level=3))

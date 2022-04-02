@@ -1,4 +1,4 @@
-cimport mat
+cimport bte
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp.set cimport set as cset
@@ -9,9 +9,9 @@ cdef class MATNode:
     """
     A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.
     """
-    cdef mat.Node* n
+    cdef bte.Node* n
 
-    cdef from_node(self,mat.Node* n):
+    cdef from_node(self,bte.Node* n):
         '''
         Load a node object from a MAT node. Attributes specific to the node such as mutations and identifier
         will be loaded automatically into python attributes and relational attributes to other nodes can be accessed through fetch methods 
@@ -68,7 +68,7 @@ cdef class MATree:
     numerous functions for tree traversal including both breadth-first and depth-first, the ability to search for a node by name and the
     ability to traverse from a specified node back to the root node.
     """
-    cdef mat.Tree t
+    cdef bte.Tree t
 
     def __init__(self, pbf=None, uncondense=True, nwk=None, vcf=None):
         if pbf != None:
@@ -86,7 +86,7 @@ cdef class MATree:
             elif vcf != None:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
-                self.t = mat.Tree()
+                self.t = bte.Tree()
 
     cdef uncondense(self):
         '''
@@ -100,32 +100,32 @@ cdef class MATree:
         '''
         self.t.condense_leaves([])
 
-    cdef assign_tree(self, mat.Tree t):
+    cdef assign_tree(self, bte.Tree t):
         self.t = t
 
     cdef resolve_all_polytomies(self):
         self.t = resolve_all_polytomies(self.t)
 
     def from_pb(self,file,uncondense=True):
-        self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
+        self.t = bte.load_mutation_annotated_tree(file.encode("UTF-8"))
         if uncondense:
             self.uncondense()
     
     def from_newick_and_vcf(self,nwk,vcf):
-        self.t = mat.create_tree_from_newick(nwk.encode("UTF-8"))
+        self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
         cdef vector[Missing_Sample] missing
-        mat.read_vcf(&self.t,vcf.encode("UTF-8"),missing,False)
+        bte.read_vcf(&self.t,vcf.encode("UTF-8"),missing,False)
 
     def save_pb(self,file,condense=True):
         if condense:
             self.condense()
-        mat.save_mutation_annotated_tree(self.t,file.encode("UTF-8"))
+        bte.save_mutation_annotated_tree(self.t,file.encode("UTF-8"))
         #uncondense again afterwards if it was condensed for saving.
         if condense:
             self.uncondense()
 
     def from_newick(self,nwk):
-        self.t = mat.create_tree_from_newick(nwk.encode("UTF-8"))
+        self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
 
     def get_parsimony_score(self):
         return self.t.get_parsimony_score()
@@ -145,9 +145,9 @@ cdef class MATree:
         for i in range(all_desc.size()):
             yield all_desc[i].decode("UTF-8")
 
-    cdef dfe_helper(self, mat.Node* node):
+    cdef dfe_helper(self, bte.Node* node):
         pynvec = []
-        cdef vector[mat.Node*] nvec = self.t.depth_first_expansion(node)
+        cdef vector[bte.Node*] nvec = self.t.depth_first_expansion(node)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -177,7 +177,7 @@ cdef class MATree:
 
     cdef bfe_helper(self, string nid):
         pynvec = []
-        cdef vector[mat.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
+        cdef vector[bte.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -188,11 +188,11 @@ cdef class MATree:
         return self.bfe_helper(nid)
 
     def get_newick_string(self,print_internal=False,print_branch_len=False,retain_original_branch_len=True,uncondense_leaves=False):
-        return mat.get_newick_string(self.t,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
+        return bte.get_newick_string(self.t,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
 
     cdef rsearch_helper(self, string nid, bool include_self):
         pynvec = []
-        cdef vector[mat.Node*] nvec = self.t.rsearch(nid,include_self)
+        cdef vector[bte.Node*] nvec = self.t.rsearch(nid,include_self)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -206,21 +206,21 @@ cdef class MATree:
         '''
         Return samples from the selected clade.
         '''
-        cdef vector[string] samples = mat.get_clade_samples(&self.t, clade_id)
+        cdef vector[string] samples = bte.get_clade_samples(&self.t, clade_id)
         return samples
 
     cdef get_mutation_samples(self, string mutation):
         '''
         Return samples containing the selected mutation.
         '''
-        cdef vector[string] samples = mat.get_mutation_samples(&self.t, mutation)
+        cdef vector[string] samples = bte.get_mutation_samples(&self.t, mutation)
         return samples
 
     cdef get_subtree(self, vector[string] samples):
         '''
         Return a subtree representing samples just from the selection.
         '''
-        cdef mat.Tree subtree = mat.filter_master(self.t, samples, False, True)
+        cdef bte.Tree subtree = bte.filter_master(self.t, samples, False, True)
         subt = MATree()
         subt.assign_tree(subtree)
         return subt
@@ -247,7 +247,7 @@ cdef class MATree:
         '''
         #the C++ allows for a preselection of samples, but we don't use that option.
         cdef vector[string] to_check = []
-        cdef vector[string] samples = mat.get_sample_match(&self.t, to_check, regexstr)
+        cdef vector[string] samples = bte.get_sample_match(&self.t, to_check, regexstr)
         return samples
     
     def get_regex(self, regexstr):
