@@ -1,6 +1,6 @@
 *.pb.gz
 *.so
-src/mat.cpp
+src/bte.cpp
 src/*.pb.cc
 src/*.pb.h
 build/*
