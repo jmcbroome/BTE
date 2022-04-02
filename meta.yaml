@@ -1,0 +1,37 @@
+package:
+  name: "bte"
+  version: "0.1.0"
+
+source:
+  git_rev: v0.1.0-alpha
+  git_url: https://github.com/jmcbroome/BTE
+
+requirements:
+  build:
+    - python=3.8
+    - setuptools
+    - make
+    - cmake=3.19.6
+    - cython
+    - boost-cpp
+    - autoconf
+    - protobuf=3.19
+    - tbb-devel=2019.0
+  run:
+    - python=3.8
+    - boost-cpp
+    - autoconf
+    - protobuf=3.19
+    - tbb-devel=2019.0
+test:
+  files:
+    - test.pb
+    - run_test.py
+  commands:
+    - python3 -m unittest run_test.py
+about:
+  home: https://github.com/jmcbroome/BTE
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "Cython wrapper enabling use of the MAT library in Python."
