@@ -1,4 +1,3 @@
-*.pb
 *.pb.gz
 *.so
 src/mat.cpp
@@ -10,4 +9,3 @@ build/*.o
 *.tsv*
 *.csv*
 *txt
-*Viral*

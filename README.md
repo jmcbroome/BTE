@@ -10,7 +10,6 @@ UCSC maintains a daily-updated mutation-annotated tree in protobuf format contai
 If you're on macOS and have conda installed, you can install our package from conda with the following:
 
 ```
-conda env create -f bte.yml
 conda install -c jmcbroome bte
 ```
 
@@ -18,26 +17,9 @@ And proceed directly to your analysis by calling "import mat" in your python scr
 
 We intend to add more platforms and python versions soon!
 
-## Core Dependencies
+## Build From Source Instructions
 
-Cython 
-
-Boost
-
-Protobuf
-
-tbb 2019
-
-Conda is required for environment and dependency management.
-
-You will also need the general suite of C++ compiler tools. On a mac, you will need xcode CLI. On linux, you may need other compiler tools. You may want to call 
-```
-conda install -c conda-forge cxx-compiler
-conda install -c anaconda make 
-```
-If you don't have make/cmake, clang/gcc and related available.
-
-## Build Instructions
+You may need to build this library from source if you are adding functionality or on a currently unsupported architecture.
 
 ### First Time Setup
 
@@ -70,6 +52,13 @@ conda activate bte
 conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=2019.0
 ```
 
+When building your own environment, you will also need the general suite of C++ compiler tools. On a mac, you may need xcode CLI. On linux, you may need other compiler tools. You may need to call 
+
+```
+conda install -c conda-forge cxx-compiler
+conda install -c anaconda make 
+```
+
 ### Building the Python-importable library
 
 Once all libraries are available, proceed to compile the .so.
@@ -88,9 +77,15 @@ From a script in the same directory as the .so!
 
 ### Example Usage
 
-To ensure the library is built and working correctly, you can obtain the latest global mutation annotated tree from the repository linked above and call our test script.
+We provide a unit test script you can use to validate that the library is functioning as intended.
+
+```
+python3 -m unittest run_test.py
+```
+
+Additionally, you can explore a simple example analysis in the BTE Tutorial jupyter notebook included in this repository! Just
+retrieve the latest tree from the UCSC repository before you being.
 
 ```
 wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
-python3 test.py
 ```
