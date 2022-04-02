@@ -82,7 +82,7 @@ python3 setup.py build_ext --inplace
 If successful, you can now import from the .so into your python environment with 
 
 ```
-import mat
+import bte
 ```
 
 From a script in the same directory as the .so!
