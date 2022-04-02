@@ -4,8 +4,6 @@ from libcpp cimport bool
 from stringstream cimport stringstream
 
 cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
-    struct Missing_Sample:
-        pass
     struct Mutation:
         string chrom
         int position
@@ -93,6 +91,8 @@ cdef extern from "usher/src/usher_graph.hpp":
     cppclass Timer:
         void Start()
         long Stop()
+    struct Missing_Sample:
+        pass
 cdef extern from "usher/src/usher_mapper.cpp":
     pass
 cdef extern from "parsimony.pb.h":

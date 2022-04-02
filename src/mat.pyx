@@ -70,16 +70,23 @@ cdef class MATree:
     """
     cdef mat.Tree t
 
-    def __init__(self, fpath="", uncondense=True):
-        if fpath != "":
-            if fpath[-3:] == ".pb" or fpath[-6:] == ".pb.gz":
-                self.from_pb(fpath,uncondense)
-            elif fpath[-3:] == ".nwk":
-                self.from_newick(fpath)
+    def __init__(self, pbf=None, uncondense=True, nwk=None, vcf=None):
+        if pbf != None:
+            if nwk != None or vcf != None:
+                print("WARNING: nwk and vcf arguments are exclusive with pbf. Ignoring nwk and vcf.")
+            if pbf[-3:] == ".pb" or pbf[-6:] == ".pb.gz":
+                self.from_pb(pbf,uncondense)
             else:
-                raise Exception("Invalid file type. Must be .pb or .nwk")
+                raise Exception("Invalid file type. Must be .pb or .pb.gz")
         else:
-            self.t = mat.Tree()
+            if nwk != None:
+                if vcf == None:
+                    raise Exception("Must provide a VCF file if loading from a newick.")
+                self.from_newick_and_vcf(nwk,vcf)
+            elif vcf != None:
+                raise Exception("Loading from VCF requires a newick file.")
+            else:
+                self.t = mat.Tree()
 
     cdef uncondense(self):
         '''
@@ -103,6 +110,11 @@ cdef class MATree:
         self.t = mat.load_mutation_annotated_tree(file.encode("UTF-8"))
         if uncondense:
             self.uncondense()
+    
+    def from_newick_and_vcf(self,nwk,vcf):
+        self.t = mat.create_tree_from_newick(nwk.encode("UTF-8"))
+        cdef vector[Missing_Sample] missing
+        mat.read_vcf(&self.t,vcf.encode("UTF-8"),missing,False)
 
     def save_pb(self,file,condense=True):
         if condense:
