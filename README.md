@@ -1,4 +1,4 @@
-# BTE
+# BIG TREE EXPLORER (BTE)
 Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher) (In Early Development). Developer version distributed as source. 
 
 # Overview
