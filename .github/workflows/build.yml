@@ -9,8 +9,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-ubuntu:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      #install the environment and all dependencies then build the extension
+      - name: fetch usher
+        run: |
+          git pull --recurse-submodules
+          git submodule update --init
+      - name: install env
+        run: |
+          $CONDA/bin/conda env update --file bte.yml --name base
+          eval "$(conda shell.bash hook)"
+          conda activate base
+          python3 setup.py build_ext --inplace
+          python3 -m unittest run_test.py
+  build-mac:
+    runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v3
       #install the environment and all dependencies then build the extension
