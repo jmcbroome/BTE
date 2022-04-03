@@ -31,7 +31,7 @@ In your script! We intend to add more platforms and python versions soon. We als
 
 ## Build From Source Instructions
 
-You may need to build this library from source if you are adding functionality or on a currently unsupported architecture.
+You may need to build this library from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version.
 
 ### First Time Setup
 
