@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - python=3.8
+  - python=3.9
   - boost-cpp
   - cython
   - cxx-compiler
