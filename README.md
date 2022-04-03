@@ -48,13 +48,13 @@ If you forgot to add this argument to your git clone call, you can run the follo
 
 ```
 git submodule update --init
-conda activate bte
 ```
 
 The next step is to prepare the environment and all relevant dependencies.
 
 ```
 conda env create -f bte.yml
+conda activate bte
 ```
 
 If the .yml isn't working for you, you can try:
