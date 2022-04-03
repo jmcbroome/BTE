@@ -8,17 +8,18 @@ source:
 
 requirements:
   build:
-    - python=3.9
+    - setuptools
+    - python=3.10
     - setuptools
     - make
-    - cmake=3.19.6
+    - cmake
     - cython
     - boost-cpp
     - autoconf
     - protobuf=3.19
     - tbb-devel=2019.0
   run:
-    - python=3.9
+    - python=3.10
     - boost-cpp
     - autoconf
     - protobuf=3.19
