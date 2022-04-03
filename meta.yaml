@@ -8,9 +8,7 @@ source:
 
 requirements:
   build:
-    - setuptools
     - python=3.10
-    - setuptools
     - make
     - cmake
     - cython
