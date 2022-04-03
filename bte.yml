@@ -5,9 +5,6 @@ channels:
 dependencies:
   - boost-cpp
   - cython
-  - cxx-compiler
-  - make
-  - cmake=3.19.6
   - autoconf
   - protobuf=3.19
   - tbb-devel=2019.0
