@@ -8,7 +8,7 @@ UCSC maintains a daily-updated mutation-annotated tree in protobuf format contai
 
 ## Quickstart
 
-If you're on macOS and have conda installed, you can install our package from conda with the following:
+If you're on osx64 or linux64 and have conda installed, you can install our package from conda with the following:
 
 ```
 conda install -c jmcbroome bte
