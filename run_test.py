@@ -2,9 +2,15 @@ import bte
 import unittest
 
 #load our test case as a universal object, outside of the test class.
-t = bte.MATree("test.pb")
+t = bte.MATree()
+basic_newick = ""
 
 class TestMat(unittest.TestCase):
+    @classmethod
+    def setUpClass(TestMat):
+        t.from_pb("test.pb")
+        basic_newick = t.write_newick()
+
     def test_ps(self):
         ps = t.get_parsimony_score()
         self.assertTrue(ps > 0)
@@ -23,4 +29,24 @@ class TestMat(unittest.TestCase):
             mutations = child.mutations
             self.assertTrue(len(mutations) > 0)
 
-    
+    def test_mutation_update(self):
+        minimuts = {'node_1':['A1234G']}
+        t.apply_mutations(minimuts)
+        n = t.get_node('node_1')
+        self.assertIn('A1234G', n.mutations)
+
+    def test_regex(self):
+        #the test protobuf includes a few USA samples.
+        testr = "USA/.*"
+        usasub = t.get_regex(testr)
+        leaves = usasub.get_leaves_ids()
+        for l in leaves:
+            self.assertRegex(l,testr)
+
+    def test_mutation_accumulation(self):
+        minimuts = {'node_1':['A1234G'],'node_2':['G1234A']}
+        t.apply_mutations(minimuts)
+        haplotypes = t.count_haplotypes()
+        for h,c in haplotypes.items():
+            #we fail if we have both- one or the other is fine.
+            self.assertTrue(not (('A1234G' in h) and ('G1234A' in h)))

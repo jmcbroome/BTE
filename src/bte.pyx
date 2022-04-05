@@ -71,19 +71,29 @@ cdef class MATNode:
         '''
         self.n.mutations.clear()
         cdef bte.Mutation newmut
+        cdef int8_t pn
+        cdef char pns
+        cdef int8_t mn
+        cdef char mns
+        assert type(mutation_list) == list
         for mstr in mutation_list:
             if ':' in mstr:
                 chro, info = mstr.split(":")
             else:
                 chro = "NC_045512v2"
                 info = mstr
-            ref = mstr[0]
-            alt = mstr[-1]
+            assert len(mstr) > 0
             loc = int(mstr[1:-1])
             newmut.chrom = chro.encode("UTF-8")
             #ref_nuc is disregarded with this loading strategy.
-            newmut.par_nuc = bte.get_nuc_id(ref.encode("UTF-8"))
-            newmut.mut_nuc = bte.get_nuc_id(alt.encode("UTF-8"))
+            pns = ord(mstr[0])
+            pn = bte.get_nuc_id(pns)
+            newmut.par_nuc = pn
+            
+            mns = ord(mstr[-1])
+            mn = bte.get_nuc_id(mns)
+            newmut.mut_nuc = mn
+
             newmut.position = loc
             self.n.mutations.push_back(newmut.copy())
 
@@ -106,17 +116,17 @@ cdef class MATree:
     ability to traverse from a specified node back to the root node.
     """
     cdef bte.Tree t
-    cdef cbool tree_only
+    cdef public cbool _tree_only
 
     @_timer
     def __init__(self, pbf=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None):
-        self.tree_only = True
+        self._tree_only = True
         if pbf != None:
             if nwk_file != None or vcf_file != None or nwk_string != None:
                 print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
             if pbf[-3:] == ".pb" or pbf[-6:] == ".pb.gz":
                 self.from_pb(pbf,uncondense)
-                self.tree_only = False
+                self._tree_only = False
             else:
                 raise Exception("Invalid file type. Must be .pb or .pb.gz")
         elif nwk_string != None:
@@ -129,7 +139,7 @@ cdef class MATree:
                     self.t = bte.create_tree_from_newick(nwk_file.encode("UTF-8"))
                 else:
                     self.from_newick_and_vcf(nwk_file,vcf_file)
-                    self.tree_only = False
+                    self._tree_only = False
             elif vcf_file != None:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
@@ -144,7 +154,7 @@ cdef class MATree:
         '''
         @functools.wraps(func)
         def wrap(self, *args, **kwargs):
-            if self.tree_only:
+            if self._tree_only:
                 raise Exception("Tree does not contain explicit mutation information and this function cannot be used. You can add mutations with apply_mutations or load from a vcf or pb.")
             else:
                 return func(self, *args,**kwargs)
@@ -155,10 +165,11 @@ cdef class MATree:
         Pass a dictionary of node:mutation list mappings (e.g. {"node_id":["chro:reflocalt","chro:reflocalt"]}, {"node_1":["chro1:A123G","chro3:T315G"]})
         to place onto the tree. Replaces any mutations currently stored in the indicated nodes.
         '''
-        for node, nms in mmap.items():
+        for nid, nms in mmap.items():
+            node = self.get_node(nid)
             node.update_mutations(nms)
         #the tree is now annotated with mutations and mutation-based functions can be attempted.
-        self.tree_only = False
+        self._tree_only = False
 
     cdef uncondense(self):
         '''
@@ -201,6 +212,16 @@ cdef class MATree:
     @_timer
     def from_newick(self,nwk):
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
+
+    def write_newick(self,subroot="",print_internal=True,print_branch_len=True,retain_original_branch_len=True,uncondense_leaves=True):
+        cdef stringstream ss
+        cdef Node* sr
+        if subroot == "":
+            sr = self.t.root
+        else:
+            se = self.t.get_node(subroot.encode("UTF-8"))
+        bte.write_newick_string(ss,self.t,sr,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
+        return ss.to_string().decode("UTF-8")
 
     def get_parsimony_score(self):
         return self.t.get_parsimony_score()
@@ -264,9 +285,6 @@ cdef class MATree:
     @_timer
     def breadth_first_expansion(self,nid=""):
         return self.bfe_helper(nid)
-
-    def get_newick_string(self,print_internal=False,print_branch_len=False,retain_original_branch_len=True,uncondense_leaves=False):
-        return bte.get_newick_string(self.t,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
 
     cdef rsearch_helper(self, string nid, bool include_self):
         pynvec = []
