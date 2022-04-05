@@ -4,6 +4,20 @@ from libcpp.string cimport string
 from libcpp.set cimport set as cset
 from libcpp.map cimport map
 from libc.stdint cimport *
+from libcpp cimport bool as cbool
+import functools
+import time
+
+def _timer(func, *args, **kwargs):
+    @functools.wraps(func)
+    def timer_wrap(*args,**kwargs):
+        start = time.perf_counter()
+        retval = func(*args,**kwargs)
+        end = time.perf_counter()
+        rt = end-start
+        print(f"Finished {func.__name__!r} in {round(rt,4)} seconds")
+        return retval
+    return timer_wrap
 
 cdef class MATNode:
     """
@@ -50,6 +64,29 @@ cdef class MATNode:
     def annotations(self):
         return [m.decode("UTF-8") for m in self.n.clade_annotations]
 
+    def update_mutations(self, mutation_list):
+        '''
+        Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
+        Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.
+        '''
+        self.n.mutations.clear()
+        cdef bte.Mutation newmut
+        for mstr in mutation_list:
+            if ':' in mstr:
+                chro, info = mstr.split(":")
+            else:
+                chro = "NC_045512v2"
+                info = mstr
+            ref = mstr[0]
+            alt = mstr[-1]
+            loc = int(mstr[1:-1])
+            newmut.chrom = chro.encode("UTF-8")
+            #ref_nuc is disregarded with this loading strategy.
+            newmut.par_nuc = bte.get_nuc_id(ref.encode("UTF-8"))
+            newmut.mut_nuc = bte.get_nuc_id(alt.encode("UTF-8"))
+            newmut.position = loc
+            self.n.mutations.push_back(newmut.copy())
+
 cdef complement(int8_t input):
     if input == 0b1:
         return 0b1000
@@ -69,24 +106,59 @@ cdef class MATree:
     ability to traverse from a specified node back to the root node.
     """
     cdef bte.Tree t
+    cdef cbool tree_only
 
-    def __init__(self, pbf=None, uncondense=True, nwk=None, vcf=None):
+    @_timer
+    def __init__(self, pbf=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None):
+        self.tree_only = True
         if pbf != None:
-            if nwk != None or vcf != None:
-                print("WARNING: nwk and vcf arguments are exclusive with pbf. Ignoring nwk and vcf.")
+            if nwk_file != None or vcf_file != None or nwk_string != None:
+                print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
             if pbf[-3:] == ".pb" or pbf[-6:] == ".pb.gz":
                 self.from_pb(pbf,uncondense)
+                self.tree_only = False
             else:
                 raise Exception("Invalid file type. Must be .pb or .pb.gz")
+        elif nwk_string != None:
+            if vcf_file != None:
+                print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.")
+            self.t = bte.create_tree_from_newick(nwk_string.encode("UTF-8"))
         else:
-            if nwk != None:
-                if vcf == None:
-                    raise Exception("Must provide a VCF file if loading from a newick.")
-                self.from_newick_and_vcf(nwk,vcf)
-            elif vcf != None:
+            if nwk_file != None:
+                if vcf_file == None:
+                    self.t = bte.create_tree_from_newick(nwk_file.encode("UTF-8"))
+                else:
+                    self.from_newick_and_vcf(nwk_file,vcf_file)
+                    self.tree_only = False
+            elif vcf_file != None:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
                 self.t = bte.Tree()
+
+    @staticmethod
+    def _check_newick_only(func, *args, **kwargs):
+        '''
+        Decorator function applied to class functions which require mutations to exist on the tree. 
+        A tree loaded from a newick alone will be unable to apply these functions and this decorator serves
+        as a readable way to add checks to these functions.
+        '''
+        @functools.wraps(func)
+        def wrap(self, *args, **kwargs):
+            if self.tree_only:
+                raise Exception("Tree does not contain explicit mutation information and this function cannot be used. You can add mutations with apply_mutations or load from a vcf or pb.")
+            else:
+                return func(self, *args,**kwargs)
+        return wrap
+
+    def apply_mutations(self, mmap):
+        '''
+        Pass a dictionary of node:mutation list mappings (e.g. {"node_id":["chro:reflocalt","chro:reflocalt"]}, {"node_1":["chro1:A123G","chro3:T315G"]})
+        to place onto the tree. Replaces any mutations currently stored in the indicated nodes.
+        '''
+        for node, nms in mmap.items():
+            node.update_mutations(nms)
+        #the tree is now annotated with mutations and mutation-based functions can be attempted.
+        self.tree_only = False
 
     cdef uncondense(self):
         '''
@@ -106,11 +178,13 @@ cdef class MATree:
     cdef resolve_all_polytomies(self):
         self.t = resolve_all_polytomies(self.t)
 
+    @_timer
     def from_pb(self,file,uncondense=True):
         self.t = bte.load_mutation_annotated_tree(file.encode("UTF-8"))
         if uncondense:
             self.uncondense()
-    
+
+    @_timer    
     def from_newick_and_vcf(self,nwk,vcf):
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
         cdef vector[Missing_Sample] missing
@@ -124,6 +198,7 @@ cdef class MATree:
         if condense:
             self.uncondense()
 
+    @_timer
     def from_newick(self,nwk):
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
 
@@ -154,12 +229,14 @@ cdef class MATree:
             pynvec.append(nodec)
         return pynvec
 
+    @_timer
     def depth_first_expansion(self, nid = ""):
         if nid == "":
             return self.dfe_helper(self.t.root)
         else:
             return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")))
 
+    @_timer
     def get_leaves(self, nid = ""):
         cdef vector[Node*] leaves = self.t.get_leaves(nid.encode("UTF-8"))
         wrappers = []
@@ -184,6 +261,7 @@ cdef class MATree:
             pynvec.append(nodec)
         return pynvec
 
+    @_timer
     def breadth_first_expansion(self,nid=""):
         return self.bfe_helper(nid)
 
@@ -224,7 +302,8 @@ cdef class MATree:
         subt = MATree()
         subt.assign_tree(subtree)
         return subt
-    
+
+    @_timer    
     def subtree(self, samples):
         cdef vector[string] samples_vec = [s.encode("UTF-8") for s in samples]
         return self.get_subtree(samples_vec)
@@ -258,6 +337,7 @@ cdef class MATree:
         print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
+    @_check_newick_only
     def with_mutation(self, mutation):
         '''
         Return a subtree of samples containing the indicated mutation.
@@ -265,9 +345,11 @@ cdef class MATree:
         cdef vector[string] samples = self.get_mutation_samples(mutation.encode("UTF-8"))
         return self.get_subtree(samples)
 
+    @_check_newick_only
     def count_mutations(self, subroot=""):
         '''
-        Cython-only function which computes the counts of individual mutation types across the tree. Can take a specific node to start from.
+        Compute the counts of individual mutation types across the tree. If a subtree root is indicated, it only counts mutations
+        descended from that node. By default, this counts across the entire tree.
         '''
         mcount = {}
         cdef Node* target_n = self.t.root
@@ -309,6 +391,7 @@ cdef class MATree:
                     allm.add(mname)
         return allm
 
+    @_check_newick_only
     def count_haplotypes(self):
         '''
         Return a dictionary of unique haplotypes and their counts. Used for nucleotide diversity estimates.
@@ -323,6 +406,7 @@ cdef class MATree:
             divtrack[smkey] += 1
         return divtrack
 
+    @_check_newick_only
     def compute_nucleotide_diversity(self):
         '''
         Cython-only function which computes the nucleotide diversity of the tree.
@@ -413,6 +497,7 @@ cdef class MATree:
         '''
         self.t.rotate_for_consistency()
 
+    @_check_newick_only
     def reverse_strand(self, genome_size = 29903):
         '''
         Inverts the tree representation of mutations such that all mutations are with respect to the reverse strand of the reference.

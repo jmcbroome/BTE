@@ -2,8 +2,12 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 from stringstream cimport stringstream
+from libc.stdint cimport *
 
 cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
+    int8_t get_nuc_id(char nuc)
+    char get_nuc(int8_t nuc_id)
+
     struct Mutation:
         string chrom
         int position
