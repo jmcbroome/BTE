@@ -20,12 +20,11 @@ class TestMat(unittest.TestCase):
         self.assertTrue(len(nodes) > 0)
 
     def test_node(self):
-        root = t.get_root()
-        children = root.children
+        children = t.root.children
         self.assertTrue(len(children) > 0)
         for child in children:
             parent = child.parent
-            self.assertTrue(parent.id == root.id)
+            self.assertTrue(parent.id == t.root.id)
             mutations = child.mutations
             self.assertTrue(len(mutations) > 0)
 
