@@ -132,7 +132,7 @@ cdef class MATree:
         elif nwk_string != None:
             if vcf_file != None:
                 print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.")
-            self.t = bte.create_tree_from_newick(nwk_string.encode("UTF-8"))
+            self.t = bte.create_tree_from_newick_string(nwk_string.encode("UTF-8"))
         else:
             if nwk_file != None:
                 if vcf_file == None:

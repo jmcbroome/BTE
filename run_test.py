@@ -50,3 +50,12 @@ class TestMat(unittest.TestCase):
         for h,c in haplotypes.items():
             #we fail if we have both- one or the other is fine.
             self.assertTrue(not (('A1234G' in h) and ('G1234A' in h)))
+
+    def test_newick_load_write(self):
+        basic_newick = t.write_newick()
+        nomut_t = bte.MATree(nwk_string = basic_newick)
+        ntl = nomut_t.get_leaves_ids()
+        self.assertTrue(len(ntl) > 0)
+        with self.assertRaises(Exception) as context:
+            nomut_t.count_haplotypes()
+        self.assertTrue('Tree does not contain explicit mutation information and this function cannot be used. You can add mutations with apply_mutations or load from a vcf or pb.' in str(context.exception))
