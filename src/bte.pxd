@@ -43,20 +43,20 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
         size_t curr_internal_node
         size_t get_max_level() const
         size_t get_num_annotations() const
-        void rename_node(string old_nid, string new_nid)
+        void rename_node(string old_nid, string new_nid) except +
         vector[Node*] get_leaves(string nid)
         vector[string] get_leaves_ids(string nid)
         size_t get_num_leaves(Node* node)
-        Node* create_node (string identifier, float branch_length, size_t num_annotations)
-        Node* create_node (string identifier, Node* par, float branch_length)
-        Node* create_node (string identifier, string parent_id, float branch_length)
+        Node* create_node (string identifier, float branch_length, size_t num_annotations) except +
+        Node* create_node (string identifier, Node* par, float branch_length) except +
+        Node* create_node (string identifier, string parent_id, float branch_length) except +
         Node* get_node (string identifier) const
         bool is_ancestor (string anc_id, string nid) const
         vector[Node*] rsearch (const string nid, bool include_self) const
         string get_clade_assignment (const Node* n, int clade_id, bool include_self) const
-        void remove_node (string nid, bool move_level)
+        void remove_node (string nid, bool move_level) except +
         void remove_single_child_nodes()
-        void move_node (string source, string destination, bool move_level)
+        void move_node (string source, string destination, bool move_level) except +
         vector[Node*] breadth_first_expansion(string nid)
         vector[Node*] depth_first_expansion(Node* node) const
         size_t get_parsimony_score()
@@ -70,13 +70,13 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
     string get_newick_string(const Tree T, bool b1, bool b2, bool b3, bool b4)
     string get_newick_string(const Tree T, Node* node, bool b1, bool b2, bool b3, bool b4)
     void write_newick_string (stringstream ss, const Tree T, Node* node, bool b1, bool b2, bool b3, bool b4)
-    Tree create_tree_from_newick (string filename)
-    Tree create_tree_from_newick_string (string newick_string)
+    Tree create_tree_from_newick (string filename) except +
+    Tree create_tree_from_newick_string (string newick_string) except +
     void string_split(string s, char delim, vector[string] words)
     void string_split(string s, vector[string] words)
     Mutation* mutation_from_string(const string mut_string)
 
-    Tree load_mutation_annotated_tree (string filename)
+    Tree load_mutation_annotated_tree (string filename) except +
     void save_mutation_annotated_tree (Tree tree, string filename)
 
     Tree get_tree_copy(const Tree tree, const string identifier)
