@@ -6,9 +6,19 @@ This repository will allow the user to leverage the power of the Mutation Annota
 
 UCSC maintains a daily-updated mutation-annotated tree in protobuf format containing all publicly available SARS-CoV-2 genome sequences [here](http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/). To try out this tool, download the latest tree, build the library, and jump straight to your Python analysis!
 
+## Who is this for?
+
+If you are 
+
+- a researcher who wants to query the global SARS-CoV-2 phylogeny for your scientific work in a way that is more complex than what is directly supported by UShER and matUtils
+- an epidemiologist or public health officer who wants to perform a hands-on Python analysis examining genetic data specific to your area or time of interest
+- a developer who wants the convenience and fast development time of Python without having to deal with the overhead and frustration of file conversions and newick manipulation
+
+This package is for you!
+
 ## Quickstart
 
-If you're on osx64 or linux64 and have conda installed, you can install our package from conda with the following:
+If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda with the following:
 
 ```
 conda install -c jmcbroome bte
