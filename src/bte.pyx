@@ -1,4 +1,6 @@
 cimport bte
+import cython
+from cython.operator cimport dereference, postincrement, preincrement
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp.set cimport set as cset
@@ -71,11 +73,8 @@ cdef class MATNode:
         '''
         self.n.mutations.clear()
         cdef bte.Mutation newmut
-        cdef int8_t pn
-        cdef char pns
-        cdef int8_t mn
-        cdef char mns
-        assert type(mutation_list) == list
+        cdef int8_t pn, mn
+        cdef char pns, mns
         for mstr in mutation_list:
             if ':' in mstr:
                 chro, info = mstr.split(":")
@@ -121,7 +120,7 @@ cdef class MATree:
 
     @_timer
     def __init__(self, pbf=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None):
-        self._tree_only = True
+        self._tree_only = False
         if pbf != None:
             if nwk_file != None or vcf_file != None or nwk_string != None:
                 print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
@@ -133,10 +132,12 @@ cdef class MATree:
             if vcf_file != None:
                 print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.")
             self.t = bte.create_tree_from_newick_string(nwk_string.encode("UTF-8"))
+            self._tree_only = True
         else:
             if nwk_file != None:
                 if vcf_file == None:
                     self.t = bte.create_tree_from_newick(nwk_file.encode("UTF-8"))
+                    self._tree_only = True
                 else:
                     self.from_newick_and_vcf(nwk_file,vcf_file)
             elif vcf_file != None:
@@ -222,6 +223,7 @@ cdef class MATree:
         Load from a newick only. The resulting tree will lack mutation information, preventing some functions from being applied.
         '''
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
+        self._tree_only = True
 
     def write_newick(self,subroot="",print_internal=True,print_branch_len=True,retain_original_branch_len=True,uncondense_leaves=True):
         cdef stringstream ss
@@ -255,7 +257,7 @@ cdef class MATree:
 
     cdef dfe_helper(self, bte.Node* node, cbool reverse):
         pynvec = []
-        cdef vector[bte.Node*] nvec = self.t.depth_first_expansion(node)            
+        cdef vector[bte.Node*] nvec = self.t.depth_first_expansion(node)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -427,20 +429,29 @@ cdef class MATree:
             target_n = self.t.get_node(subroot.encode("UTF-8"))
         return self.t.get_num_leaves(target_n)
 
-    cdef accumulate_mutations(self, string sample):
-        cdef vector[Node*] ancestors = self.t.rsearch(sample, True)
-        allm = set()
-        for i in range(ancestors.size()):
+    cdef cset[bte.Mutation] accumulate_mutations(self, string sample):
+        cdef vector[bte.Node*] ancestors = self.t.rsearch(sample, True)
+        cdef cset[bte.Mutation] allm
+        cdef size_t i
+        cdef bte.Node* cnode
+        cdef bte.Mutation m, om
+        cdef cset[bte.Mutation].iterator oml
+        cdef size_t ancs = ancestors.size()
+        for i in range(ancs):
             #proceed in reverse order e.g. root to sample.
-            for m in ancestors[ancestors.size()-i-1].mutations:
+            cnode = ancestors[ancs-i-1]
+            for j in range(cnode.mutations.size()):
+                m = cnode.mutations[j]
                 #check that the opposite of this mutation is not in the set
                 #if it is, instead delete it and skip this entry (as they negate each other with respect to the sample's final genome)
-                mname = m.get_string().decode("UTF-8")
-                oppo = mname[-1] + mname[1:-1] + mname[0]
-                if oppo in allm:
-                    allm.remove(oppo)
+                om = m.copy()
+                om.mut_nuc = m.par_nuc
+                om.par_nuc = m.mut_nuc
+                oml = allm.find(om)
+                if oml != allm.end():
+                    allm.erase(oml)
                 else:
-                    allm.add(mname)
+                    allm.insert(m)
         return allm
 
     @_check_newick_only
@@ -448,51 +459,91 @@ cdef class MATree:
         '''
         Return the complete set of mutations the indicated node has with respect to the root. 
         '''
-        return self.accumulate_mutations(nid)
+        pyset = set()
+        cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid)
+        cdef cset[bte.Mutation].iterator accm_it = accm.begin()
+        while accm_it != accm.end():
+            pyset.add(dereference(accm_it).get_string())
+            postincrement(accm_it)
+        return pyset
 
-    @_check_newick_only
-    def count_haplotypes(self):
+    cdef count_differences(self, cset[bte.Mutation] l1, cset[bte.Mutation] l2):
+        cdef size_t total_matched = 0
+        cdef bte.Mutation e1
+        cdef cset[bte.Mutation].iterator it = l1.begin()
+        while it != l1.end():
+            e1 = dereference(it)
+            if l2.find(e1) != l2.end():
+                total_matched += 1
+            postincrement(it)
+        return l1.size() + l2.size() - (total_matched * 2)
+
+    cdef map[cset[bte.Mutation],size_t] count_haplotypes_c(self):
         '''
         Return a dictionary of unique haplotypes and their counts. Used for nucleotide diversity estimates.
         '''
         cdef vector[string] samples = self.t.get_leaves_ids("".encode("UTF-8"))
-        divtrack = {}
+        cdef map[cset[bte.Mutation],size_t] divtrack
+        cdef map[cset[bte.Mutation],size_t].iterator finder
+        cdef size_t i
+        cdef cset[bte.Mutation] accum_muts
         for i in range(samples.size()):
-            smset = self.accumulate_mutations(samples[i])
-            smkey = tuple(sorted(smset))
-            if smkey not in divtrack:
-                divtrack[smkey] = 0
-            divtrack[smkey] += 1
+            accum_muts = self.accumulate_mutations(samples[i])
+            finder = divtrack.find(accum_muts)
+            if finder == divtrack.end():
+                divtrack[accum_muts] = 1
+            else:
+                divtrack[accum_muts] = dereference(finder).second + 1
         return divtrack
 
+    @_check_newick_only    
+    @_timer
+    def count_haplotypes(self):
+        cdef map[cset[bte.Mutation],size_t] hmap = self.count_haplotypes_c()
+        cdef map[cset[bte.Mutation],size_t].iterator it = hmap.begin()
+        cdef cset[bte.Mutation].iterator it2
+        pymap = {}
+        while it != hmap.end():
+            mset = set()
+            it2 = dereference(it).first.begin()
+            while it2 != dereference(it).first.end():
+                mset.add(dereference(it2).get_string())
+                postincrement(it2)
+            pymap[tuple(mset)] = dereference(it).second
+            postincrement(it)
+        return pymap
+
     @_check_newick_only
+    @cython.cdivision(True)
     def compute_nucleotide_diversity(self):
         '''
-        Cython-only function which computes the nucleotide diversity of the tree.
+        Function which computes the nucleotide diversity of the tree.
         This is defined as the mean number of pairwise differences in nucleotides between any two leaves
-        of the tree. 
+        of the tree. Computes an unbiased estimator which multiplies the final mean by the total number of sequences divided by the total number of sequences minus one.
         '''
-        def count_differences(l1,l2):
-            total_matched = 0
-            sl2 = set(l2)
-            for element in l1:
-                if element in sl2:
-                    total_matched += 1
-            return (len(l1)-total_matched) + (len(l2)-total_matched)
         #compute the set of mutations belonging to each sample in the tree, then compute pi from the resulting frequencies
         #since each sample is individually rsearched, this implementation is less efficient than an informed traversal, but still fast enough for most purposes.
-        divtrack = self.count_haplotypes()
-        total_seq = sum(divtrack.values())
-        div = 0
-        for g1 in divtrack.keys():
-            g1_freq = divtrack[g1] / total_seq
-            for g2 in divtrack.keys():
-                if g1 != g2:
-                    g2_freq = divtrack[g2] / total_seq
-                    #pair_diff = len(set(g1).symmetric_difference(set(g2)))
-                    pair_diff = count_differences(g1,g2)
-                    div += pair_diff * g1_freq * g2_freq
-        #multiply the final result to guarantee an unbiased estimator (see wikipedia entry?)
+        cdef map[cset[bte.Mutation],size_t] divtrack = self.count_haplotypes_c()
+        cdef size_t total_seq = self.t.get_leaves_ids("".encode('UTF-8')).size()
+        assert total_seq > 0
+        cdef float div = 0
+        cdef map[cset[bte.Mutation],size_t].iterator it = divtrack.begin()
+        cdef map[cset[bte.Mutation],size_t].iterator it2
+        cdef float g1_freq, g2_freq
+        cdef size_t pair_diff
+        while it != divtrack.end():
+            g1_freq = dereference(it).second / total_seq
+            assert g1_freq > 0
+            it2 = it
+            postincrement(it2)
+            while it2 != divtrack.end():
+                g2_freq = dereference(it2).second / total_seq
+                assert g2_freq > 0
+                pair_diff = self.count_differences(dereference(it).first,dereference(it2).first)
+                div = div + (g1_freq * g2_freq * pair_diff)
+                postincrement(it2)
+            postincrement(it)
+        #multiply the final result to guarantee an unbiased estimator (see wikipedia entry)
         return div * (total_seq / (total_seq - 1))
 
     def simple_parsimony(self, leaf_assignments):
@@ -513,6 +564,7 @@ cdef class MATree:
         cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
         cdef Node* cnode
         cdef vector[Node*] children
+        cdef size_t i
         for i in range(nodes.size()):
             cnode = nodes[nodes.size()-i-1]
             if not cnode.is_leaf():
