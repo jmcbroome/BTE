@@ -65,8 +65,21 @@ cdef class MATNode:
 
     @property
     def annotations(self):
-        return [m.decode("UTF-8") for m in self.n.clade_annotations]
-
+        cdef bte.Node* ancestor = self.n
+        cdef size_t anncount = self.n.clade_annotations.size()
+        cdef vector[string] annotes 
+        cdef size_t k
+        annotations = [None for i in range(anncount)]
+        while all([a==None for a in annotations]):
+            annotes = ancestor.clade_annotations
+            for k in range(annotes.size()):
+                if annotes[k].size() > 0 and (annotations[k] == None):
+                    annotations[k] = annotes[k].decode("UTF-8")
+            if ancestor.parent == cython.NULL:
+                break
+            ancestor = ancestor.parent
+        return annotations
+            
     def update_mutations(self, mutation_list):
         '''
         Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
@@ -511,6 +524,31 @@ cdef class MATree:
             else:
                 divtrack[accum_muts] = dereference(finder).second + 1
         return divtrack
+
+    def count_clades_inclusive(self, subroot=""):
+        '''
+        Count the total number of leaves belonging to each clade on the subtree.
+        Counts are inclusive (e.g. samples belonging to a clade descended from another clade will count for the ancestor clade as well)
+        By default, counts across the whole tree.
+        '''
+        cdef vector[string] leaves = self.t.get_leaves_ids(subroot.encode("UTF-8"))
+        cdef size_t i,j,k
+        cdef vector[bte.Node*] ancestors
+        cdef vector[string] canns
+        cdef string ann
+        clade_counts = {}
+        for i in range(leaves.size()):
+            ancestors = self.t.rsearch(leaves[i], True)
+            for j in range(ancestors.size()):
+                canns = ancestors[j].clade_annotations
+                for k in range(canns.size()):
+                    ann = canns[k]
+                    if ann.size() > 0:
+                        annstr = ann.decode("UTF-8")
+                        if annstr not in clade_counts:
+                            clade_counts[annstr] = 0
+                        clade_counts[annstr] += 1
+        return clade_counts
 
     @_check_newick_only    
     @_timer
