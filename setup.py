@@ -20,4 +20,4 @@ extensions = [Extension("bte",["src/bte.pyx"],
     extra_compile_args=["-std=c++17"]
     )]
 
-setup(name='bte',ext_modules=cythonize(extensions,language_level=3))
+setup(name='bte',ext_modules=cythonize(extensions,language_level=3,annotate=True))

@@ -11,3 +11,4 @@ build/*.o
 *txt
 *html
 *ipynb
+__pycache__/*
