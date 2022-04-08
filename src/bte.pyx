@@ -9,6 +9,7 @@ from libc.stdint cimport *
 from libcpp cimport bool as cbool
 import functools
 import time
+import datetime as dt
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -566,6 +567,7 @@ cdef class MATree:
         This function is an implementation of the small parsimony problem (Fitch algorithm) for a single set of states.
         It takes as input a dictionary mapping leaf names to character states and returns a dictionary mapping both leaf and internal node names to inferred character states.
         '''
+        ##TODO: refactoring this to use more c types would increase efficiency notably. It's fairly niche in application, though.
         #this algorithm traverses the tree in postorder (reverse depth-first)
         #it requires that the tree be fully resolved and bifurcating, so that's the first step.
         #note on efficiency- we're using Python dicts to do most of the set logic, which are slower than using native C++ objects
