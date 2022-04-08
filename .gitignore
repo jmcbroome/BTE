@@ -9,3 +9,5 @@ build/*.o
 *.tsv*
 *.csv*
 *txt
+*html
+*ipynb
