@@ -2,6 +2,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp cimport bool
 from stringstream cimport stringstream
+from libc.stdint cimport *
 
 cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
     struct Mutation:
@@ -108,6 +109,7 @@ cdef extern from "usher/src/matUtils/select.cpp":
     vector[string] get_clade_samples(Tree* T, string clade_name)
     vector[string] get_mutation_samples(Tree* T, string mutation_id)
     vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
+    vector[string] fill_random_samples(Tree* T, vector[string] current_samples, size_t target_size, bool lca_limit)
 cdef extern from "usher/src/matUtils/filter.cpp":
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
     Tree resolve_all_polytomies(Tree T)

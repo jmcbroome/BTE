@@ -258,6 +258,21 @@ cdef class MATree:
         print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
+    def get_random(self, size, current_samples = [], lca_limit = False):
+        '''
+        Select a random subtree of the selected size. Optionally, pass a list of samples to include.
+        If the list of samples to include is larger than the target size, random samples will be removed from the list.
+        Set lca_limit to True to limit random selection to below the common ancestor of the current selection.
+        Selects as many as possible if not enough are available.
+        '''
+        if len(current_samples) == 0 and lca_limit:
+            Exception("LCA limit requires a selection of samples to be passed in.")
+        cdef vector[string] starting_samples = current_samples
+        cdef size_t target_size = size
+        cdef bool lcal = lca_limit
+        cdef vector[string] final_samples = bte.fill_random_samples(&self.t, starting_samples, target_size, lcal)
+        return self.get_subtree(final_samples)
+
     def with_mutation(self, mutation):
         '''
         Return a subtree of samples containing the indicated mutation.
