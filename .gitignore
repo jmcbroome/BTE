@@ -9,3 +9,4 @@ build/*.o
 *.tsv*
 *.csv*
 *txt
+__pycache__/*
