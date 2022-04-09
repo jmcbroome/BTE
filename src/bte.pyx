@@ -352,20 +352,6 @@ cdef class MATree:
         '''
         return self.rsearch_helper(nid.encode("UTF-8"),include_self,reverse)
 
-    cdef get_clade_samples(self, string clade_id):
-        '''
-        Return samples from the selected clade.
-        '''
-        cdef vector[string] samples = bte.get_clade_samples(&self.t, clade_id)
-        return samples
-
-    cdef get_mutation_samples(self, string mutation):
-        '''
-        Return samples containing the selected mutation.
-        '''
-        cdef vector[string] samples = bte.get_mutation_samples(&self.t, mutation)
-        return samples
-
     cdef get_subtree(self, vector[string] samples):
         cdef bte.Tree subtree
         with nogil:
@@ -382,29 +368,36 @@ cdef class MATree:
         cdef vector[string] samples_vec = [s.encode("UTF-8") for s in samples]
         return self.get_subtree(samples_vec)
 
+    cpdef vector[string] get_clade_samples(self, clade_id):
+        '''
+        Return samples from the selected clade.
+        '''
+        cdef vector[string] samples = bte.get_clade_samples(&self.t, clade_id.encode("UTF-8"))
+        return samples
+
     def get_clade(self, clade_id):
         '''
         Return a subtree representing the selected clade.
         '''
         print("Getting clade: " + clade_id)
-        cdef vector[string] samples = self.get_clade_samples(clade_id.encode("UTF-8"))
+        cdef vector[string] samples = self.get_clade_samples(clade_id)
         if samples.size() == 0:
             print("Error: requested clade not found.")
             return None
         print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
-    cdef get_regex_match(self, string regexstr):
+    cpdef vector[string] get_regex_samples(self, regexstr):
         #the C++ allows for a preselection of samples, but we don't use that option.
         cdef vector[string] to_check = []
-        cdef vector[string] samples = bte.get_sample_match(&self.t, to_check, regexstr)
+        cdef vector[string] samples = bte.get_sample_match(&self.t, to_check, regexstr.encode("UTF-8"))
         return samples
     
     def get_regex(self, regexstr):
         '''
         Return a subtree containing all samples matching the regular expression.
         '''
-        cdef vector[string] samples = self.get_regex_match(regexstr.encode("UTF-8"))
+        cdef vector[string] samples = self.get_regex_samples(regexstr)
         if samples.size() == 0:
             print("Error: requested regex does not match any samples.")
             return None
@@ -426,12 +419,22 @@ cdef class MATree:
         cdef vector[string] final_samples = bte.fill_random_samples(&self.t, starting_samples, target_size, lcal)
         return self.get_subtree(final_samples)
 
+    cpdef vector[string] get_mutation_samples(self, mutation):
+        '''
+        Return samples containing the selected mutation.
+        '''
+        #can't use the error decorator for this function since it is cpdef.
+        if self._tree_only:
+            Exception("Cannot find mutations on a tree-only MATree.")
+        cdef vector[string] samples = bte.get_mutation_samples(&self.t, mutation.encode("UTF-8"))
+        return samples
+
     @_check_newick_only
-    def with_mutation(self, mutation):
+    def get_mutation(self, mutation):
         '''
         Return a subtree of samples containing the indicated mutation.
         '''
-        cdef vector[string] samples = self.get_mutation_samples(mutation.encode("UTF-8"))
+        cdef vector[string] samples = self.get_mutation_samples(mutation)
         return self.get_subtree(samples)
 
     @_check_newick_only
@@ -492,7 +495,7 @@ cdef class MATree:
     @_check_newick_only
     def mutation_set(self, nid):
         '''
-        Return the complete set of mutations the indicated node has with respect to the root. 
+        Return the complete set of mutations the indicated node has with respect to the reference. 
         '''
         pyset = set()
         cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid)
