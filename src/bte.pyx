@@ -208,7 +208,11 @@ cdef class MATree:
         '''
         Load from a protobuf. Includes both tree and mutation information.
         '''
-        self.t = bte.load_mutation_annotated_tree(file.encode("UTF-8"))
+        cdef string fn = file.encode("UTF-8")
+        cdef bte.Tree lt
+        with nogil:
+            lt = bte.load_mutation_annotated_tree(fn)
+        self.t = lt
         if uncondense:
             self.uncondense()
         self._tree_only = False
@@ -363,7 +367,9 @@ cdef class MATree:
         return samples
 
     cdef get_subtree(self, vector[string] samples):
-        cdef bte.Tree subtree = bte.filter_master(self.t, samples, False, True)
+        cdef bte.Tree subtree
+        with nogil:
+            subtree = bte.filter_master(self.t, samples, False, True)
         subt = MATree()
         subt.assign_tree(subtree)
         return subt

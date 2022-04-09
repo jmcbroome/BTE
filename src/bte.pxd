@@ -4,7 +4,7 @@ from libcpp cimport bool
 from stringstream cimport stringstream
 from libc.stdint cimport *
 
-cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree":
+cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree" nogil:
     int8_t get_nuc_id(char nuc)
     char get_nuc(int8_t nuc_id)
 
@@ -89,30 +89,30 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
     void clear_tree(Tree tree)
 
     void read_vcf (Tree* T, string vcf_filename, vector[Missing_Sample] missing_samples, bool create_new_mat)
-cdef extern from "usher/src/mutation_annotated_tree.cpp":
+cdef extern from "usher/src/mutation_annotated_tree.cpp" nogil:
     pass
-cdef extern from "usher/src/usher_graph.hpp":
+cdef extern from "usher/src/usher_graph.hpp" nogil:
     cppclass Timer:
         void Start()
         long Stop()
     struct Missing_Sample:
         pass
-cdef extern from "usher/src/usher_mapper.cpp":
+cdef extern from "usher/src/usher_mapper.cpp" nogil:
     pass
-cdef extern from "parsimony.pb.h":
+cdef extern from "parsimony.pb.h" nogil:
     pass
-cdef extern from "parsimony.pb.cc":
+cdef extern from "parsimony.pb.cc" nogil:
     pass
-cdef extern from "usher/src/matUtils/common.hpp":
+cdef extern from "usher/src/matUtils/common.hpp" nogil:
     pass
 #cython really does not like declaring global variables as extern in headers, so deliberately write and link a declaration in its own file.
-cdef extern from "timer.cpp":
+cdef extern from "timer.cpp" nogil:
     pass
-cdef extern from "usher/src/matUtils/select.cpp":
+cdef extern from "usher/src/matUtils/select.cpp" nogil:
     vector[string] get_clade_samples(Tree* T, string clade_name)
     vector[string] get_mutation_samples(Tree* T, string mutation_id)
     vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
     vector[string] fill_random_samples(Tree* T, vector[string] current_samples, size_t target_size, bool lca_limit)
-cdef extern from "usher/src/matUtils/filter.cpp":
+cdef extern from "usher/src/matUtils/filter.cpp" nogil:
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
     Tree resolve_all_polytomies(Tree T)
