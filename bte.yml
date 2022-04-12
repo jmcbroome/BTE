@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - boost-cpp
+  - boost-cpp=1.73.0
   - cython
   - autoconf
   - protobuf=3.19
