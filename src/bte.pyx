@@ -1,3 +1,4 @@
+#cython: embedsignature=True
 cimport bte
 import cython
 from cython.operator cimport dereference, postincrement, preincrement
@@ -158,6 +159,9 @@ cdef class MATree:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
                 self.t = bte.Tree()
+    
+    def __del__(self):
+        bte.clear_tree(self.t)
 
     @staticmethod
     def _check_newick_only(func, *args, **kwargs):
@@ -320,7 +324,7 @@ cdef class MATree:
 
     cdef bfe_helper(self, string nid, cbool reverse):
         pynvec = []
-        cdef vector[bte.Node*] nvec = self.t.breadth_first_expansion(nid.encode("UTF-8"))
+        cdef vector[bte.Node*] nvec = self.t.breadth_first_expansion(nid)
         for i in range(nvec.size()):
             nodec = MATNode()
             nodec.from_node(nvec[i])
@@ -334,7 +338,7 @@ cdef class MATree:
         '''
         Perform a level order (breadth-first) expansion starting from the indicated node. Use reverse to traverse in reverse level order (all leaves, then all leaf parents, back to root) instead.
         '''
-        return self.bfe_helper(nid,reverse)
+        return self.bfe_helper(nid.encode("UTF-8"),reverse)
 
     cdef rsearch_helper(self, string nid, cbool include_self, cbool reverse):
         pynvec = []
@@ -498,7 +502,7 @@ cdef class MATree:
         Return the complete set of mutations the indicated node has with respect to the reference. 
         '''
         pyset = set()
-        cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid)
+        cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid.encode("UTF-8"))
         cdef cset[bte.Mutation].iterator accm_it = accm.begin()
         while accm_it != accm.end():
             pyset.add(dereference(accm_it).get_string())
@@ -587,7 +591,7 @@ cdef class MATree:
         #compute the set of mutations belonging to each sample in the tree, then compute pi from the resulting frequencies
         #since each sample is individually rsearched, this implementation is less efficient than an informed traversal, but still fast enough for most purposes.
         cdef map[cset[bte.Mutation],size_t] divtrack = self.count_haplotypes_c()
-        cdef size_t total_seq = self.t.get_leaves_ids("".encode('UTF-8')).size()
+        cdef size_t total_seq = self.t.get_leaves_ids(self.t.root.identifier).size()
         assert total_seq > 0
         cdef float div = 0
         cdef map[cset[bte.Mutation],size_t].iterator it = divtrack.begin()
