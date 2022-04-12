@@ -161,6 +161,12 @@ cdef class MATree:
                 self.t = bte.Tree()
     
     def __del__(self):
+        #when we are done with the tree in Python, ensure all nodes and mutations are deallocated
+        #node objects should persist past the expiration of a python MATNode wrapper, but the tree should not past the MATree wrapper
+        #the Tree itself is stack-allocated, so is handled automatically, but Nodes and Mutations are heap allocated and need to be cleared.
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        for i in range(nodes.size()):
+            nodes[i].mutations.clear()
         bte.clear_tree(self.t)
 
     @staticmethod
@@ -581,7 +587,6 @@ cdef class MATree:
         return pymap
 
     @_check_newick_only
-    @cython.cdivision(True)
     def compute_nucleotide_diversity(self):
         '''
         Function which computes the nucleotide diversity of the tree.
@@ -592,11 +597,12 @@ cdef class MATree:
         #since each sample is individually rsearched, this implementation is less efficient than an informed traversal, but still fast enough for most purposes.
         cdef map[cset[bte.Mutation],size_t] divtrack = self.count_haplotypes_c()
         cdef size_t total_seq = self.t.get_leaves_ids(self.t.root.identifier).size()
-        assert total_seq > 0
-        cdef float div = 0
+        if total_seq == 0:
+            raise Exception("No sequences found in tree")
+        cdef double div = 0
         cdef map[cset[bte.Mutation],size_t].iterator it = divtrack.begin()
         cdef map[cset[bte.Mutation],size_t].iterator it2
-        cdef float g1_freq, g2_freq
+        cdef double g1_freq, g2_freq
         cdef size_t pair_diff
         while it != divtrack.end():
             g1_freq = dereference(it).second / total_seq
