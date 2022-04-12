@@ -41,6 +41,10 @@ bte.MATree("public-latest.all.masked.pb.gz")
 
 In your script! We intend to add more platforms and python versions soon. We also include an example analysis in an ipython notebook [here](https://github.com/jmcbroome/BTE/blob/main/BTE%20Tutorial.ipynb)!
 
+### A Note on Versions and Architectures
+
+We provide conda builds for Linux and MacOS at this time, using slightly different versions of Python (3.9 and 3.8 respectively, due to dependency conflicts). If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem.
+
 ## Build From Source Instructions
 
 You may need to build this library from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version.
