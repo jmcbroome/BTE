@@ -13,13 +13,13 @@ requirements:
     - setuptools
     - cmake
     - cython
-    - boost-cpp
+    - boost-cpp=1.73.0
     - autoconf
     - protobuf=3.19
     - tbb-devel=2019.0
   run:
     - python
-    - boost-cpp
+    - boost-cpp=1.73.0
     - autoconf
     - protobuf=3.19
     - tbb-devel=2019.0
