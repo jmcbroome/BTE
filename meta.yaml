@@ -1,9 +1,9 @@
 package:
   name: "bte"
-  version: "0.5.0"
+  version: "0.5.1"
 
 source:
-  git_rev: v0.5.0-alpha
+  git_rev: v0.5.1-alpha
   git_url: https://github.com/jmcbroome/BTE
 
 requirements:
