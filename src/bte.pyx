@@ -132,10 +132,12 @@ cdef class MATree:
     """
     cdef bte.Tree t
     cdef public cbool _tree_only
+    cdef public cbool _empty
 
     @_timer
     def __init__(self, pbf=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None):
         self._tree_only = False
+        self._empty = False
         if pbf != None:
             if nwk_file != None or vcf_file != None or nwk_string != None:
                 print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
@@ -160,14 +162,21 @@ cdef class MATree:
             else:
                 self.t = bte.Tree()
     
+    def clear(self):
+        '''
+        Call this function to explicitly deallocate all tree memory. Use when the tree object is no longer necessary 
+        and high memory use is becoming problematic. Automatically called on garbage collection.
+        '''
+        cdef vector[Node*] nodes 
+        if not self._empty:
+            nodes = self.t.depth_first_expansion(self.t.root)
+            for i in range(nodes.size()):
+                nodes[i].mutations.clear()
+            bte.clear_tree(self.t)
+            self._empty = True
+
     def __del__(self):
-        #when we are done with the tree in Python, ensure all nodes and mutations are deallocated
-        #node objects should persist past the expiration of a python MATNode wrapper, but the tree should not past the MATree wrapper
-        #the Tree itself is stack-allocated, so is handled automatically, but Nodes and Mutations are heap allocated and need to be cleared.
-        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
-        for i in range(nodes.size()):
-            nodes[i].mutations.clear()
-        bte.clear_tree(self.t)
+        self.clear()
 
     @staticmethod
     def _check_newick_only(func, *args, **kwargs):
