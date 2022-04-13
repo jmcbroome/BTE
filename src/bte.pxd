@@ -109,10 +109,10 @@ cdef extern from "usher/src/matUtils/common.hpp" nogil:
 cdef extern from "timer.cpp" nogil:
     pass
 cdef extern from "usher/src/matUtils/select.cpp" nogil:
-    vector[string] get_clade_samples(Tree* T, string clade_name)
-    vector[string] get_mutation_samples(Tree* T, string mutation_id)
-    vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring)
-    vector[string] fill_random_samples(Tree* T, vector[string] current_samples, size_t target_size, bool lca_limit)
+    vector[string] get_clade_samples(Tree* T, string clade_name) except + 
+    vector[string] get_mutation_samples(Tree* T, string mutation_id) except + 
+    vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring) except +
+    vector[string] fill_random_samples(Tree* T, vector[string] current_samples, size_t target_size, bool lca_limit) except + 
 cdef extern from "usher/src/matUtils/filter.cpp" nogil:
-    Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations)
-    Tree resolve_all_polytomies(Tree T)
+    Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations) except +
+    Tree resolve_all_polytomies(Tree T) except + 
