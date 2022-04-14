@@ -135,16 +135,18 @@ cdef class MATree:
     cdef public cbool _empty
 
     @_timer
-    def __init__(self, pbf=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None):
+    def __init__(self, pb_file=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None, json_file=None):
         self._tree_only = False
         self._empty = False
-        if pbf != None:
+        if pb_file != None:
             if nwk_file != None or vcf_file != None or nwk_string != None:
                 print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
-            if pbf[-3:] == ".pb" or pbf[-6:] == ".pb.gz":
-                self.from_pb(pbf,uncondense)
+            if pb_file[-3:] == ".pb" or pb_file[-6:] == ".pb.gz":
+                self.from_pb(pb_file,uncondense)
             else:
-                raise Exception("Invalid file type. Must be .pb or .pb.gz")
+                raise Exception("Invalid file type for pb_file argument. Must be .pb or .pb.gz")
+        elif json_file != None:
+            self.from_json(json_file)
         elif nwk_string != None:
             if vcf_file != None:
                 print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.")
@@ -243,7 +245,7 @@ cdef class MATree:
         '''
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
         cdef vector[Missing_Sample] missing
-        bte.read_vcf(&self.t,vcf.encode("UTF-8"),missing,False)
+        bte.read_vcf(&self.t,vcf.encode("UTF-8"),missing,True)
         self._tree_only = False
 
     def save_pb(self,file,condense=True):
@@ -271,6 +273,56 @@ cdef class MATree:
             se = self.t.get_node(subroot.encode("UTF-8"))
         bte.write_newick_string(ss,self.t,sr,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
         return ss.to_string().decode("UTF-8")
+
+    cpdef vector[string] _read_samples(self,samples):
+        '''
+        Helper function which converts a Python list of bytes or string samples to a usable C++ string vector.
+        Returns all leaf names if samples is empty.
+        '''
+        cdef vector[string] sample_names
+        if len(samples) == 0:
+            sample_names = self.t.get_leaves_ids("".encode("UTF-8"))
+        else:
+            for s in samples:
+                if type(s) == str:
+                    sample_names.push_back(s.encode("UTF-8"))
+                elif type(s) == bytes:
+                    sample_names.push_back(s)
+                else:
+                    raise Exception("Sample names must be strings or bytes.")
+        return sample_names
+
+    def write_vcf(self,vcf_file,no_genotypes=False,samples=[]):
+        '''
+        Write a vcf representing the chosen samples to the indicated file. By default, writes a vcf including all samples.
+        '''
+        sample_names = self._read_samples(samples)
+        bte.make_vcf(self.t,vcf_file.encode("UTF-8"),no_genotypes,sample_names)
+
+    def from_json(self,jsonf):
+        '''
+        Load a mat from a json compatible with the Auspice.us visualization web tool.
+        '''
+        self.t = bte.load_mat_from_json(jsonf.encode("UTF-8"))
+
+    def write_json(self,jsonf,samples=[],title="Tree",metafiles=[]):
+        '''
+        Writ a json compatible with the Auspice.us visualization web tool containing the indicated samples.
+        Default behavior includes the whole tree.
+        You can optionally pass a tsv or csv file or a list of tsv and csv files
+        containing categorical metadata to decorate the json with (one sample per row).
+        '''
+        cdef vector[string] sample_names = self._read_samples(samples)
+        cdef cset[string] sample_set
+        for i in range(sample_names.size()):
+            sample_set.insert(sample_names[i])
+        cdef vector[unordered_map[string,unordered_map[string,string]]] catmeta
+        if type(metafiles) == str:
+            catmeta.push_back(bte.read_metafile(metafiles.encode("UTF-8"),sample_set))
+        elif type(metafiles) == list and len(metafiles) > 0:
+            for mf in metafiles:
+                catmeta.push_back(bte.read_metafile(mf.encode("UTF-8"),sample_set))
+        bte.write_json_from_mat(&self.t,jsonf.encode("UTF-8"),&catmeta,title.encode("UTF-8"))
 
     def get_parsimony_score(self):
         '''
@@ -384,7 +436,7 @@ cdef class MATree:
         '''
         Return a subtree containing all samples in the input list.
         '''
-        cdef vector[string] samples_vec = [s.encode("UTF-8") for s in samples]
+        cdef vector[string] samples_vec = self._read_samples(samples)
         return self.get_subtree(samples_vec)
 
     cpdef vector[string] get_clade_samples(self, clade_id):
@@ -457,7 +509,7 @@ cdef class MATree:
         return self.get_subtree(samples)
 
     @_check_newick_only
-    def count_mutations(self, subroot=""):
+    def count_mutation_types(self, subroot=""):
         '''
         Compute the counts of individual mutation types across the tree. If a subtree root is indicated, it only counts mutations
         descended from that node. By default, this counts across the entire tree.
@@ -712,3 +764,16 @@ cdef class MATree:
             #since nodes[i] is a pointer to the original node object, we can simply edit it inplace.
             nodes[i].mutations = nmv
         
+    def list_clades(self):
+        '''
+        Return a set of all valid clade annotations in the tree that can be used with get_clade and other functions.
+        '''
+        clades = set()
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        cdef vector[string] anns
+        for i in range(nodes.size()):
+            anns = nodes[i].clade_annotations
+            for j in range(anns.size()):
+                if anns[j].size() > 0:
+                    clades.add(anns[j].decode("UTF-8"))
+        return clades

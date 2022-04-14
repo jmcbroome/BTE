@@ -1,8 +1,10 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.set cimport set as cset
 from libcpp cimport bool
 from stringstream cimport stringstream
 from libc.stdint cimport *
+from libcpp.unordered_map cimport unordered_map
 
 cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Annotated_Tree" nogil:
     int8_t get_nuc_id(char nuc)
@@ -105,7 +107,6 @@ cdef extern from "parsimony.pb.cc" nogil:
     pass
 cdef extern from "usher/src/matUtils/common.hpp" nogil:
     pass
-#cython really does not like declaring global variables as extern in headers, so deliberately write and link a declaration in its own file.
 cdef extern from "timer.cpp" nogil:
     pass
 cdef extern from "usher/src/matUtils/select.cpp" nogil:
@@ -113,6 +114,11 @@ cdef extern from "usher/src/matUtils/select.cpp" nogil:
     vector[string] get_mutation_samples(Tree* T, string mutation_id) except + 
     vector[string] get_sample_match(Tree* T, vector[string] samples_to_check, string substring) except +
     vector[string] fill_random_samples(Tree* T, vector[string] current_samples, size_t target_size, bool lca_limit) except + 
+    unordered_map[string,unordered_map[string,string]] read_metafile(string metainf, cset[string] samples_to_use) except +
 cdef extern from "usher/src/matUtils/filter.cpp" nogil:
     Tree filter_master(Tree T, vector[string] samples, bool prune, bool keep_clade_annotations) except +
     Tree resolve_all_polytomies(Tree T) except + 
+cdef extern from "usher/src/matUtils/convert.cpp" nogil:
+    void make_vcf (Tree T, string vcf_filename, bool no_genotypes, vector[string] samples_vec) except + 
+    void write_json_from_mat(Tree* T, string output_filename, vector[unordered_map[string,unordered_map[string,string]]]* catmeta, string title) except + 
+    Tree load_mat_from_json(string json_filename) except + 
