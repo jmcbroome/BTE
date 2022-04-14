@@ -3,7 +3,6 @@ import unittest
 import os
 #load our test case as a universal object, outside of the test class.
 t = bte.MATree()
-basic_newick = ""
 
 def check_tree_struct(t1,t2):
     return (t1.write_newick() == t2.write_newick())
@@ -12,7 +11,6 @@ class TestMat(unittest.TestCase):
     @classmethod
     def setUpClass(TestMat):
         t.from_pb("test.pb")
-        basic_newick = t.write_newick()
 
     def test_ps(self):
         ps = t.get_parsimony_score()
