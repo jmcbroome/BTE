@@ -8,6 +8,10 @@ This tool is generally intended as a replacement for ETE3, Biopython.Phylo, and 
 
 UCSC maintains a repository, updated each day, containing the complete and latest publicly-available global SARS-CoV-2 phylogenetic tree in MAT protobuf format [here](http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/). To try out this tool, download the latest tree, build the library, and jump straight to your Python analysis!
 
+We also provide a [binder](https://github.com/jmcbroome/bte-binder) of example analyses, which you can launch by clicking on the badge below!
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jmcbroome/bte-binder/HEAD)
+
 ## Who is this for?
 
 If you are 
