@@ -115,11 +115,3 @@ We provide a unit test script you can use to validate that the library is functi
 ```
 python3 -m unittest run_test.py
 ```
-
-Additionally, you can explore a simple example analysis in the BTE Tutorial jupyter notebook included in this repository! Just
-retrieve the latest tree from the UCSC repository before you begin.
-
-```
-wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
-juypter notebook
-```
