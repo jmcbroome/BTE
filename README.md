@@ -94,7 +94,7 @@ conda install -c anaconda make
 
 ### Building the Python-importable library
 
-Once all libraries are available, proceed to compile the .so.
+Once all libraries are available, proceed to compile the shared object file (.so).
 
 ```
 python3 setup.py build_ext --inplace
@@ -107,8 +107,6 @@ import bte
 ```
 
 From a script in the same directory as the .so!
-
-### Example Usage
 
 We provide a unit test script you can use to validate that the library is functioning as intended.
 
