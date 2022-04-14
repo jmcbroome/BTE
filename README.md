@@ -36,14 +36,12 @@ Download the latest public SARS-CoV-2 tree:
 wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
 ```
 
-And proceed directly to your analysis by calling
+And proceed directly to your analysis in Python!
 
 ```
 import bte
-bte.MATree("public-latest.all.masked.pb.gz")
+tree = bte.MATree("public-latest.all.masked.pb.gz")
 ```
-
-In your script! We intend to add more platforms and python versions soon. We also include an example analysis in an ipython notebook [here](https://github.com/jmcbroome/BTE/blob/main/BTE%20Tutorial.ipynb)!
 
 ### A Note on Versions and Architectures
 
@@ -94,7 +92,7 @@ conda install -c anaconda make
 
 ### Building the Python-importable library
 
-Once all libraries are available, proceed to compile the .so.
+Once all libraries are available, proceed to compile the shared object file (.so).
 
 ```
 python3 setup.py build_ext --inplace
@@ -108,18 +106,8 @@ import bte
 
 From a script in the same directory as the .so!
 
-### Example Usage
-
 We provide a unit test script you can use to validate that the library is functioning as intended.
 
 ```
 python3 -m unittest run_test.py
-```
-
-Additionally, you can explore a simple example analysis in the BTE Tutorial jupyter notebook included in this repository! Just
-retrieve the latest tree from the UCSC repository before you begin.
-
-```
-wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
-juypter notebook
 ```
