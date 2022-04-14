@@ -36,14 +36,12 @@ Download the latest public SARS-CoV-2 tree:
 wget http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb.gz
 ```
 
-And proceed directly to your analysis by calling
+And proceed directly to your analysis in Python!
 
 ```
 import bte
-bte.MATree("public-latest.all.masked.pb.gz")
+tree = bte.MATree("public-latest.all.masked.pb.gz")
 ```
-
-In your script! We intend to add more platforms and python versions soon. We also include an example analysis in an ipython notebook [here](https://github.com/jmcbroome/BTE/blob/main/BTE%20Tutorial.ipynb)!
 
 ### A Note on Versions and Architectures
 
