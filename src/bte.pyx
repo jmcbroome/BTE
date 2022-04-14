@@ -1,4 +1,5 @@
 #cython: embedsignature=True
+#cython: annotation_typing=True
 cimport bte
 import cython
 from cython.operator cimport dereference, postincrement, preincrement
@@ -10,7 +11,7 @@ from libc.stdint cimport *
 from libcpp cimport bool as cbool
 import functools
 import time
-import datetime as dt
+from typing import Optional, Union
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -135,7 +136,7 @@ cdef class MATree:
     cdef public cbool _empty
 
     @_timer
-    def __init__(self, pb_file=None, uncondense=True, nwk_file=None, nwk_string=None, vcf_file=None, json_file=None):
+    def __init__(self, pb_file: Optional[str] = None, uncondense: bool = True, nwk_file: Optional[str] = None, nwk_string: Optional[str] = None, vcf_file: Optional[str] = None, json_file: Optional[str] = None) -> None:
         self._tree_only = False
         self._empty = False
         if pb_file != None:
@@ -164,7 +165,7 @@ cdef class MATree:
             else:
                 self.t = bte.Tree()
     
-    def clear(self):
+    def clear(self) -> None:
         '''
         Call this function to explicitly deallocate all tree memory. Use when the tree object is no longer necessary 
         and high memory use is becoming problematic. Automatically called on garbage collection.
@@ -195,7 +196,7 @@ cdef class MATree:
                 return func(self, *args,**kwargs)
         return wrap
 
-    def apply_mutations(self, mmap):
+    def apply_mutations(self, mmap: dict) -> None:
         '''
         Pass a dictionary of node:mutation list mappings (e.g. {"node_id":["chro:reflocalt","chro:reflocalt"]}, {"node_1":["chro1:A123G","chro3:T315G"]})
         to place onto the tree. Replaces any mutations currently stored in the indicated nodes.
@@ -225,9 +226,9 @@ cdef class MATree:
         self.t = resolve_all_polytomies(self.t)
 
     @_timer
-    def from_pb(self,file,uncondense=True):
+    def from_pb(self, file: str, uncondense: bool = True) -> None:
         '''
-        Load from a protobuf. Includes both tree and mutation information.
+        Load from a protobuf into the initalized wrapper. Includes both tree and mutation information.
         '''
         cdef string fn = file.encode("UTF-8")
         cdef bte.Tree lt
@@ -239,7 +240,7 @@ cdef class MATree:
         self._tree_only = False
 
     @_timer    
-    def from_newick_and_vcf(self,nwk,vcf):
+    def from_newick_and_vcf(self, nwk: str, vcf: str) -> None:
         '''
         Load from a newick and a vcf. The vcf must contain sample entries (genotype columns) for every leaf in the newick.
         '''
@@ -248,7 +249,7 @@ cdef class MATree:
         bte.read_vcf(&self.t,vcf.encode("UTF-8"),missing,True)
         self._tree_only = False
 
-    def save_pb(self,file,condense=True):
+    def save_pb(self, file: str, condense: bool = True) -> None:
         if condense:
             self.condense()
         bte.save_mutation_annotated_tree(self.t,file.encode("UTF-8"))
@@ -257,17 +258,17 @@ cdef class MATree:
             self.uncondense()
 
     @_timer
-    def from_newick(self,nwk):
+    def from_newick(self, nwk: str) -> None:
         '''
         Load from a newick only. The resulting tree will lack mutation information, preventing some functions from being applied.
         '''
         self.t = bte.create_tree_from_newick(nwk.encode("UTF-8"))
         self._tree_only = True
 
-    def write_newick(self,subroot="",print_internal=True,print_branch_len=True,retain_original_branch_len=True,uncondense_leaves=True):
+    def write_newick(self, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True) -> str:
         cdef stringstream ss
         cdef Node* sr
-        if subroot == "":
+        if subroot == None:
             sr = self.t.root
         else:
             se = self.t.get_node(subroot.encode("UTF-8"))
@@ -292,20 +293,20 @@ cdef class MATree:
                     raise Exception("Sample names must be strings or bytes.")
         return sample_names
 
-    def write_vcf(self,vcf_file,no_genotypes=False,samples=[]):
+    def write_vcf(self, vcf_file: str , no_genotypes: bool = False,samples: list = []) -> None:
         '''
         Write a vcf representing the chosen samples to the indicated file. By default, writes a vcf including all samples.
         '''
         sample_names = self._read_samples(samples)
         bte.make_vcf(self.t,vcf_file.encode("UTF-8"),no_genotypes,sample_names)
 
-    def from_json(self,jsonf):
+    def from_json(self, jsonf: str) -> None:
         '''
         Load a mat from a json compatible with the Auspice.us visualization web tool.
         '''
         self.t = bte.load_mat_from_json(jsonf.encode("UTF-8"))
 
-    def write_json(self,jsonf,samples=[],title="Tree",metafiles=[]):
+    def write_json(self, jsonf: str, samples: list = [], title: str = "Tree", metafiles: list = []) -> None:
         '''
         Writ a json compatible with the Auspice.us visualization web tool containing the indicated samples.
         Default behavior includes the whole tree.
@@ -324,13 +325,13 @@ cdef class MATree:
                 catmeta.push_back(bte.read_metafile(mf.encode("UTF-8"),sample_set))
         bte.write_json_from_mat(&self.t,jsonf.encode("UTF-8"),&catmeta,title.encode("UTF-8"))
 
-    def get_parsimony_score(self):
+    def get_parsimony_score(self) -> None:
         '''
         Compute the parsimony score of the complete tree.
         '''
         return self.t.get_parsimony_score()
 
-    def get_node(self,name):
+    def get_node(self,name) -> Node:
         '''
         Create a MATNode class object representing the indicated node.
         '''
@@ -339,7 +340,7 @@ cdef class MATree:
         return nc
 
     @property
-    def root(self):
+    def root(self) -> Node:
         nc = MATNode()
         nc.from_node(self.t.root)
         return nc
@@ -356,18 +357,18 @@ cdef class MATree:
         return pynvec
 
     @_timer
-    def depth_first_expansion(self, nid = "", reverse = False):
+    def depth_first_expansion(self, nid: Optional[str] = None, reverse: bool = False) -> list[MATNode]:
         '''
         Perform a preorder (depth-first) expansion of the tree, starting from the indicated node. 
         By default, traverses the whole tree. Set reverse to true to traverse in postorder (reverse depth-first) instead.
         '''
-        if nid == "":
+        if nid == None:
             return self.dfe_helper(self.t.root, reverse)
         else:
             return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")), reverse)
 
     @_timer
-    def get_leaves(self, nid = ""):
+    def get_leaves(self, nid: str = "") -> list[MATNode]:
         '''
         Create a list of MATNode objects representing each leaf descended from the indicated node. By default, returns all leaves on the tree.
         '''
@@ -379,7 +380,7 @@ cdef class MATree:
         return wrappers
 
     @_timer
-    def get_leaves_ids(self, nid = ""):
+    def get_leaves_ids(self, nid: str = "") -> list[str]:
         '''
         Return a list of leaf name strings containing all leaves descended from the indicated node. By default, returns all leaves on the tree.
         '''
@@ -401,7 +402,7 @@ cdef class MATree:
         return pynvec
 
     @_timer
-    def breadth_first_expansion(self, nid="", reverse=False):
+    def breadth_first_expansion(self, nid: str = "", reverse: bool = False) -> list[MATNode]:
         '''
         Perform a level order (breadth-first) expansion starting from the indicated node. Use reverse to traverse in reverse level order (all leaves, then all leaf parents, back to root) instead.
         '''
@@ -416,7 +417,7 @@ cdef class MATree:
             pynvec.append(nodec)
         return pynvec
 
-    def rsearch(self,nid,include_self=False,reverse=False):
+    def rsearch(self, nid: str, include_self: bool = False,reverse: bool = False) -> list[MATNode]:
         '''
         Return a list of MATNode objects representing the ancestors of the indicated node back to the root in order from the node to the root.
         Include_self will include the indicated node on the path. Reverse will yield the path in reverse order (root to node).
@@ -432,7 +433,7 @@ cdef class MATree:
         return subt
 
     @_timer    
-    def subtree(self, samples):
+    def subtree(self, samples: list[Union[str,bytes]]) -> MATree:
         '''
         Return a subtree containing all samples in the input list.
         '''
@@ -446,7 +447,7 @@ cdef class MATree:
         cdef vector[string] samples = bte.get_clade_samples(&self.t, clade_id.encode("UTF-8"))
         return samples
 
-    def get_clade(self, clade_id):
+    def get_clade(self, clade_id: str) -> MATree:
         '''
         Return a subtree representing the selected clade.
         '''
@@ -464,7 +465,7 @@ cdef class MATree:
         cdef vector[string] samples = bte.get_sample_match(&self.t, to_check, regexstr.encode("UTF-8"))
         return samples
     
-    def get_regex(self, regexstr):
+    def get_regex(self, regexstr: str) -> MATree:
         '''
         Return a subtree containing all samples matching the regular expression.
         '''
@@ -475,7 +476,7 @@ cdef class MATree:
         print("Successfully found {} samples.".format(len(samples)))
         return self.get_subtree(samples)
 
-    def get_random(self, size, current_samples = [], lca_limit = False):
+    def get_random(self, size: int, current_samples: list = [], lca_limit: bool = False) -> MATree:
         '''
         Select a random subtree of the selected size. Optionally, pass a list of samples to include.
         If the list of samples to include is larger than the target size, random samples will be removed from the list.
@@ -501,7 +502,7 @@ cdef class MATree:
         return samples
 
     @_check_newick_only
-    def get_mutation(self, mutation):
+    def get_mutation(self, mutation: str):
         '''
         Return a subtree of samples containing the indicated mutation.
         '''
@@ -509,14 +510,14 @@ cdef class MATree:
         return self.get_subtree(samples)
 
     @_check_newick_only
-    def count_mutation_types(self, subroot=""):
+    def count_mutation_types(self, subroot: Optional[str] = None) -> dict[str,int]:
         '''
         Compute the counts of individual mutation types across the tree. If a subtree root is indicated, it only counts mutations
         descended from that node. By default, this counts across the entire tree.
         '''
         mcount = {}
         cdef Node* target_n = self.t.root
-        if subroot != "":
+        if subroot != None:
             target_n = self.t.get_node(subroot.encode("UTF-8"))
         cdef vector[Node*] nvec = self.t.depth_first_expansion(target_n)
         for i in range(nvec.size()):
@@ -529,12 +530,12 @@ cdef class MATree:
                     mcount[pym_type] = 1
         return mcount
 
-    def count_leaves(self, subroot = ""):
+    def count_leaves(self, subroot: Optional[str] = None) -> int:
         '''
         Return the number of leaves descended from the indicated node. By default, counts all leaves on the tree.
         '''
         cdef Node* target_n = self.t.root
-        if subroot != "":
+        if subroot != None:
             target_n = self.t.get_node(subroot.encode("UTF-8"))
         return self.t.get_num_leaves(target_n)
 
@@ -564,7 +565,7 @@ cdef class MATree:
         return allm
 
     @_check_newick_only
-    def mutation_set(self, nid):
+    def mutation_set(self, nid: str) -> set[str]:
         '''
         Return the complete set of mutations the indicated node has with respect to the reference. 
         '''
@@ -605,7 +606,7 @@ cdef class MATree:
                 divtrack[accum_muts] = dereference(finder).second + 1
         return divtrack
 
-    def count_clades_inclusive(self, subroot=""):
+    def count_clades_inclusive(self, subroot: str = "") -> dict[str,int]:
         '''
         Count the total number of leaves belonging to each clade on the subtree.
         Counts are inclusive (e.g. samples belonging to a clade descended from another clade will count for the ancestor clade as well)
@@ -632,7 +633,7 @@ cdef class MATree:
 
     @_check_newick_only    
     @_timer
-    def count_haplotypes(self):
+    def count_haplotypes(self) -> dict[tuple,int]:
         cdef map[cset[bte.Mutation],size_t] hmap = self.count_haplotypes_c()
         cdef map[cset[bte.Mutation],size_t].iterator it = hmap.begin()
         cdef cset[bte.Mutation].iterator it2
@@ -648,7 +649,7 @@ cdef class MATree:
         return pymap
 
     @_check_newick_only
-    def compute_nucleotide_diversity(self):
+    def compute_nucleotide_diversity(self) -> float:
         '''
         Function which computes the nucleotide diversity of the tree.
         This is defined as the mean number of pairwise differences in nucleotides between any two leaves
@@ -680,7 +681,7 @@ cdef class MATree:
         #multiply the final result to guarantee an unbiased estimator (see wikipedia entry)
         return div * (total_seq / (total_seq - 1))
 
-    def simple_parsimony(self, leaf_assignments):
+    def simple_parsimony(self, leaf_assignments) -> dict[str,str]:
         '''
         This function is an implementation of the small parsimony problem (Fitch algorithm) for a single set of states.
         It takes as input a dictionary mapping leaf names to character states and returns a dictionary mapping both leaf and internal node names to inferred character states.
@@ -737,14 +738,14 @@ cdef class MATree:
         print("{} final assignments".format(len(final_node_assignment)))
         return final_node_assignment
 
-    def ladderize(self):
+    def ladderize(self) -> None:
         '''
         Sort the branches of the tree according to the size of each partition.
         '''
         self.t.rotate_for_consistency()
 
     @_check_newick_only
-    def reverse_strand(self, genome_size = 29903):
+    def reverse_strand(self, genome_size: int = 29903) -> None:
         '''
         Inverts the tree representation of mutations such that all mutations are with respect to the reverse strand of the reference.
         All bases are complemented and indeces are reversed. The tree structure itself and parsimony scores are unaffected.
@@ -764,7 +765,7 @@ cdef class MATree:
             #since nodes[i] is a pointer to the original node object, we can simply edit it inplace.
             nodes[i].mutations = nmv
         
-    def list_clades(self):
+    def list_clades(self) -> set[str]:
         '''
         Return a set of all valid clade annotations in the tree that can be used with get_clade and other functions.
         '''
