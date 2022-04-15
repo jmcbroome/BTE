@@ -12,6 +12,8 @@ We also provide a [binder](https://github.com/jmcbroome/bte-binder) of example a
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jmcbroome/bte-binder/HEAD)
 
+We also provide complete [documentation](https://jmcbroome.github.io/BTE/build/html/index.html) for all available functions!
+
 ## Who is this for?
 
 If you are 
