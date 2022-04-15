@@ -6,12 +6,11 @@
 BTE API Documentation
 =====================
 
+This page contains the docstrings for each function in the BTE API. 
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-
-* :ref:`genindex`
+:ref:`genindex`
 
 .. automodule:: bte
    :members:
