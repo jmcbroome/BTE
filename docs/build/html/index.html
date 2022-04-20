@@ -107,9 +107,9 @@ are from a specific clade or lineage.</p>
 <dt class="sig sig-object py" id="bte.MATree.breadth_first_expansion">
 <span class="sig-name descname"><span class="pre">breadth_first_expansion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">nid:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">u''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">reverse:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#bte.MATNode" title="bte.MATNode"><span class="pre">MATNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.breadth_first_expansion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a level order (breadth-first) expansion starting from the indicated node. Use reverse to traverse in reverse level order (all leaves, then all leaf parents, back to root) instead.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>nid (str, optional): Node to begin the traversal at. Defaults to the root.
-reverse (bool, optional): Perform the traversal in reverse. Defaults to False.</p>
+<dl>
+<dt>Args:</dt><dd><p>nid (str, optional): Node to begin the traversal at. Defaults to the root.</p>
+<p>reverse (bool, optional): Perform the traversal in reverse. Defaults to False.</p>
 </dd>
 <dt>Returns:</dt><dd><p>list[MATNode]: List of MATNode wrappers representing the nodes in the traversal.</p>
 </dd>
@@ -190,9 +190,9 @@ descended from that node. By default, this counts across the entire tree.</p>
 <span class="sig-name descname"><span class="pre">depth_first_expansion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nid:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">reverse:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#bte.MATNode" title="bte.MATNode"><span class="pre">MATNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.depth_first_expansion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a preorder (depth-first) expansion of the tree, starting from the indicated node. 
 By default, traverses the whole tree. Set reverse to true to traverse in postorder (reverse depth-first) instead.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>nid (Optional[str], optional): Node to begin the traversal at. Defaults to the root.
-reverse (bool, optional): Traverse in reverse order. Defaults to False.</p>
+<dl>
+<dt>Args:</dt><dd><p>nid (Optional[str], optional): Node to begin the traversal at. Defaults to the root.</p>
+<p>reverse (bool, optional): Traverse in reverse order. Defaults to False.</p>
 </dd>
 <dt>Returns:</dt><dd><p>list[MATNode]: List of nodes in depth-first order.</p>
 </dd>
@@ -223,9 +223,9 @@ reverse (bool, optional): Traverse in reverse order. Defaults to False.</p>
 <dt class="sig sig-object py" id="bte.MATree.from_newick_and_vcf">
 <span class="sig-name descname"><span class="pre">from_newick_and_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">nwk:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">vcf:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.from_newick_and_vcf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load from a newick and a vcf. The vcf must contain sample entries (genotype columns) for every leaf in the newick.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>nwk (str): Path to a text file containing the tree to load in Newick format.
-vcf (str): Path to a text file containing leaf/sample genotype information in VCF format.</p>
+<dl>
+<dt>Args:</dt><dd><p>nwk (str): Path to a text file containing the tree to load in Newick format.</p>
+<p>vcf (str): Path to a text file containing leaf/sample genotype information in VCF format.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -244,9 +244,9 @@ vcf (str): Path to a text file containing leaf/sample genotype information in VC
 <dt class="sig sig-object py" id="bte.MATree.from_pb">
 <span class="sig-name descname"><span class="pre">from_pb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">file:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">uncondense:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.from_pb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load from a protobuf into the initalized wrapper. Includes both tree and mutation information.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>file (str): Path to a .pb or .pb.gz file.
-uncondense (bool, optional): Uncondense the tree after loading (split identical samples into individual leaves). Defaults to True.</p>
+<dl>
+<dt>Args:</dt><dd><p>file (str): Path to a .pb or .pb.gz file.</p>
+<p>uncondense (bool, optional): Uncondense the tree after loading (split identical samples into individual leaves). Defaults to True.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -330,7 +330,7 @@ uncondense (bool, optional): Uncondense the tree after loading (split identical 
 <dl class="simple">
 <dt>Args:</dt><dd><p>name (str): ID of the node to fetch.</p>
 </dd>
-<dt>Returns:</dt><dd><p>MATNode: MATNode class object representing the indicated node.</p>
+<dt>Returns:</dt><dd><p>MATNode: MATNode class object representing the indicated node.s</p>
 </dd>
 </dl>
 </dd></dl>
@@ -352,10 +352,10 @@ uncondense (bool, optional): Uncondense the tree after loading (split identical 
 If the list of samples to include is larger than the target size, random samples will be removed from the list.
 Set lca_limit to True to limit random selection to below the common ancestor of the current selection.
 Selects as many as possible if not enough are available.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>size (int): The size of the subtree to select.
-current_samples (list, optional): List of samples to include in the set. Defaults to [].
-lca_limit (bool, optional): Limit randomly selected samples to below the LCA of the input samples. Defaults to False.</p>
+<dl>
+<dt>Args:</dt><dd><p>size (int): The size of the subtree to select.</p>
+<p>current_samples (list, optional): List of samples to include in the set. Defaults to [].</p>
+<p>lca_limit (bool, optional): Limit randomly selected samples to below the LCA of the input samples. Defaults to False.</p>
 </dd>
 <dt>Returns:</dt><dd><p>MATree: A subtree containing the selected samples.</p>
 </dd>
@@ -439,10 +439,10 @@ All bases are complemented and indeces are reversed. The tree structure itself a
 <dt class="sig sig-object py" id="bte.MATree.rsearch">
 <span class="sig-name descname"><span class="pre">rsearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">nid:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">include_self:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">reverse:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#bte.MATNode" title="bte.MATNode"><span class="pre">MATNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.rsearch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of MATNode objects representing the ancestors of the indicated node back to the root in order from the node to the root.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>nid (str): ID of the node to get the ancestry of.
-include_self (bool, optional): Include the indicated node on the path. Defaults to False.
-reverse (bool, optional): Return the path in reverse order. Defaults to False.</p>
+<dl>
+<dt>Args:</dt><dd><p>nid (str): ID of the node to get the ancestry of.</p>
+<p>include_self (bool, optional): Include the indicated node on the path. Defaults to False.</p>
+<p>reverse (bool, optional): Return the path in reverse order. Defaults to False.</p>
 </dd>
 <dt>Returns:</dt><dd><p>list[MATNode]: A list of ancestors of the indicated node.</p>
 </dd>
@@ -453,9 +453,9 @@ reverse (bool, optional): Return the path in reverse order. Defaults to False.</
 <dt class="sig sig-object py" id="bte.MATree.save_pb">
 <span class="sig-name descname"><span class="pre">save_pb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">file:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">condense:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.save_pb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the tree to a protobuf file.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>file (str): Name for the .pb file.
-condense (bool, optional): Condense the tree before saving. Defaults to True.</p>
+<dl>
+<dt>Args:</dt><dd><p>file (str): Name for the .pb file.</p>
+<p>condense (bool, optional): Condense the tree before saving. Defaults to True.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -490,11 +490,11 @@ It takes as input a dictionary mapping leaf names to character states and return
 <span class="sig-name descname"><span class="pre">write_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">jsonf:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">title:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">u'Tree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metafiles:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.write_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a json compatible with the Auspice.us visualization web tool containing the indicated samples. Default behavior includes the whole tree.
 You can optionally pass a tsv or csv file or a list of tsv and csv files containing categorical metadata to decorate the json with (one sample per row).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>jsonf (str): Name for the JSON output.
-samples (list, optional): Samples to use. Defaults to all samples.
-title (str, optional): Title of the JSON. Defaults to &quot;Tree&quot;.
-metafiles (list, optional): Metadata tsv and csv files to use. Defaults to no metadata.</p>
+<dl>
+<dt>Args:</dt><dd><p>jsonf (str): Name for the JSON output.</p>
+<p>samples (list, optional): Samples to use. Defaults to all samples.</p>
+<p>title (str, optional): Title of the JSON. Defaults to &quot;Tree&quot;.</p>
+<p>metafiles (list, optional): Metadata tsv and csv files to use. Defaults to no metadata.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -503,12 +503,12 @@ metafiles (list, optional): Metadata tsv and csv files to use. Defaults to no me
 <dt class="sig sig-object py" id="bte.MATree.write_newick">
 <span class="sig-name descname"><span class="pre">write_newick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subroot:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_internal:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">retain_original_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">uncondense_leaves:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#bte.MATree.write_newick" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a newick string from the tree.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.
-print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.
-print_branch_len (bool, optional): Print branch lengths. Defaults to True.
-retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.
-uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.</p>
+<dl>
+<dt>Args:</dt><dd><p>subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.</p>
+<p>print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.</p>
+<p>print_branch_len (bool, optional): Print branch lengths. Defaults to True.</p>
+<p>retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.</p>
+<p>uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.</p>
 </dd>
 <dt>Returns:</dt><dd><p>str: A newick string representation of the tree.</p>
 </dd>
@@ -519,10 +519,10 @@ uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. 
 <dt class="sig sig-object py" id="bte.MATree.write_vcf">
 <span class="sig-name descname"><span class="pre">write_vcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">vcf_file:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">no_genotypes:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.write_vcf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a vcf representing the chosen samples to the indicated file. By default, writes a vcf including all samples.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>vcf_file (str): Name the output vcf file.
-no_genotypes (bool, optional): Do not include individual genotype information in the output vcf. Defaults to False.
-samples (list[str], optional): Samples to include. Defaults to all samples.</p>
+<dl>
+<dt>Args:</dt><dd><p>vcf_file (str): Name the output vcf file.</p>
+<p>no_genotypes (bool, optional): Do not include individual genotype information in the output vcf. Defaults to False.</p>
+<p>samples (list[str], optional): Samples to include. Defaults to all samples.</p>
 </dd>
 </dl>
 </dd></dl>
