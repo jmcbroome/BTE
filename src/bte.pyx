@@ -1038,7 +1038,6 @@ cdef class MATree:
         for a in annotations:
             newnode.clade_annotations.push_back(a)
         
-
     def move_node(self, to_move: str, new_parent: str) -> None:
         """Move a node from its current parent to a new parent. 
 

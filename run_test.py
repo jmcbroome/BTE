@@ -74,3 +74,7 @@ class TestMat(unittest.TestCase):
         self.assertTrue(check_tree_struct(t,t2))
         os.remove("test.nwk")
         os.remove("test.vcf")
+
+    def test_node_creation(self):
+        t.create_node("node_X",t.root.id)
+        self.assertTrue(t.get_node("node_X").parent.id == t.root.id)
