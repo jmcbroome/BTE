@@ -1049,7 +1049,8 @@ cdef class MATree:
         self.t.move_node(to_move.encode("UTF-8"), new_parent.encode("UTF-8"), True)
 
     def remove_node(self, to_remove: str) -> None:
-        """Remove a node from the tree. This is a destructive operation.
+        """Remove a node from the tree. This is a destructive operation. 
+        WARNING: It can cause segmentation faults if children are left orphaned.
 
         Args:
             to_remove (str): The identifier of the node to remove.

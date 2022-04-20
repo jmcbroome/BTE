@@ -75,6 +75,10 @@ class TestMat(unittest.TestCase):
         os.remove("test.nwk")
         os.remove("test.vcf")
 
-    def test_node_creation(self):
+    def test_node_manipulation(self):
         t.create_node("node_X",t.root.id)
         self.assertTrue(t.get_node("node_X").parent.id == t.root.id)
+        t.create_node("node_Y",t.root.id)
+        t.move_node("node_X","node_Y")
+        self.assertTrue(t.get_node("node_X").parent.id == "node_Y")
+        t.remove_node("node_Y")
