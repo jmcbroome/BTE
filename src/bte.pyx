@@ -54,15 +54,17 @@ cdef class MATNode:
     """
     cdef bte.Node* n
 
-    def __init__(self, tree: MATree, parent: Optional[str] = None, identifier: str = "", mutations: list = [], annotations: list = []):
+    def __init__(self, tree: MATree = None, parent: Optional[str] = None, identifier: str = "", mutations: list = [], annotations: list = []):
         """
         Initalize a MATNode and an associated Node and add it to the tree as a child of the indicated Node.
-        Can optionally have mutations loaded as well. By default, creates a wrapper with no associated Node.
+        Can optionally have mutations loaded as well. By default, creates a MATNode wrapper with no associated Node.
 
         args:
-            parent: The identifier of the parent Node. Must be set to create a Node.
+            tree: MATree object to add the node to.
 
-            identifier: The identifier to use for the Node. Must be unique. Must be set to create a Node.
+            parent: The identifier of the parent Node.
+
+            identifier: The identifier to use for the Node. Must be unique.
 
             mutations: A list of mutations to apply to the Node. Optional.
 
@@ -140,7 +142,7 @@ cdef class MATNode:
         self.n.mutations.clear()
         cdef bte.Mutation newmut
         for mstr in mutation_list:
-            newmut = instantiate_mutation(mstr.encode("UTF-8"))
+            newmut = instantiate_mutation(mstr)
             self.n.mutations.push_back(newmut)
 
 cdef complement(int8_t input):
