@@ -49,8 +49,6 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
         vector[Node*] get_leaves(string nid)
         vector[string] get_leaves_ids(string nid)
         size_t get_num_leaves(Node* node)
-        Node* create_node (string identifier, float branch_length, size_t num_annotations) except +
-        Node* create_node (string identifier, Node* par, float branch_length) except +
         Node* create_node (string identifier, string parent_id, float branch_length) except +
         Node* get_node (string identifier) const
         bool is_ancestor (string anc_id, string nid) const

@@ -24,11 +24,56 @@ def _timer(func, *args, **kwargs):
         return retval
     return timer_wrap
 
+cdef bte.Mutation instantiate_mutation(str mstr):
+    """
+    Instantiate a Mutation struct from a string.
+    """
+    cdef bte.Mutation newmut
+    cdef int8_t pn, mn
+    cdef char pns, mns
+    if ':' in mstr:
+        chro, info = mstr.split(":")
+    else:
+        chro = "NC_045512v2"
+        info = mstr
+    assert len(mstr) > 0
+    loc = int(mstr[1:-1])
+    newmut.chrom = chro.encode("UTF-8")
+    pns = ord(mstr[0])
+    pn = bte.get_nuc_id(pns)
+    newmut.par_nuc = pn
+    mns = ord(mstr[-1])
+    mn = bte.get_nuc_id(mns)
+    newmut.mut_nuc = mn
+    newmut.position = loc
+    return newmut
+
 cdef class MATNode:
     """
     A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.
     """
     cdef bte.Node* n
+
+    def __init__(self, tree: MATree, parent: Optional[str] = None, identifier: str = "", mutations: list = [], annotations: list = []):
+        """
+        Initalize a MATNode and an associated Node and add it to the tree as a child of the indicated Node.
+        Can optionally have mutations loaded as well. By default, creates a wrapper with no associated Node.
+
+        args:
+            parent: The identifier of the parent Node. Must be set to create a Node.
+
+            identifier: The identifier to use for the Node. Must be unique. Must be set to create a Node.
+
+            mutations: A list of mutations to apply to the Node. Optional.
+
+            annotations: A list of annotations to apply to the Node. Optional.
+        """
+
+        if identifier != "" and parent != None:
+            tree.create_node(identifier, parent, mutations, annotations)
+            self.n = tree.t.get_node(identifier.encode("UTF-8"))
+            if len(mutations) > 0:
+                self.update_mutations(mutations)
 
     cdef from_node(self, bte.Node* n):
         """"
@@ -94,28 +139,9 @@ cdef class MATNode:
         """        
         self.n.mutations.clear()
         cdef bte.Mutation newmut
-        cdef int8_t pn, mn
-        cdef char pns, mns
         for mstr in mutation_list:
-            if ':' in mstr:
-                chro, info = mstr.split(":")
-            else:
-                chro = "NC_045512v2"
-                info = mstr
-            assert len(mstr) > 0
-            loc = int(mstr[1:-1])
-            newmut.chrom = chro.encode("UTF-8")
-            #ref_nuc is disregarded with this loading strategy.
-            pns = ord(mstr[0])
-            pn = bte.get_nuc_id(pns)
-            newmut.par_nuc = pn
-            
-            mns = ord(mstr[-1])
-            mn = bte.get_nuc_id(mns)
-            newmut.mut_nuc = mn
-
-            newmut.position = loc
-            self.n.mutations.push_back(newmut.copy())
+            newmut = instantiate_mutation(mstr.encode("UTF-8"))
+            self.n.mutations.push_back(newmut)
 
 cdef complement(int8_t input):
     if input == 0b1:
@@ -986,3 +1012,60 @@ cdef class MATree:
                 if anns[j].size() > 0:
                     clades.add(anns[j].decode("UTF-8"))
         return clades
+
+    def create_node(self, identifier: str, parent_id: str, mutations: list[str] = [], annotations = []):
+        """Create a new node and place it in the tree.
+
+        Args:
+            identifer (str): The identifier of the new node.
+            
+            parent_id (str): The identifier of the parent node.
+
+            mutations (list[str]): A list of mutations to add to the new node. Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.
+
+            annotations (list[str]): A list of annotations to add to the new node. Currently limited to 2 or less.
+        """
+        if len(annotations) > 2:
+            raise ValueError("Cannot have more than 2 annotations per node due to internal implementation limitations.")
+        cdef float blen = float(len(mutations))
+        cdef Node* newnode = self.t.create_node(identifier.encode("UTF-8"),parent_id.encode("UTF-8"),blen)
+        cdef bte.Mutation newmut
+        for m in mutations:
+            newmut = instantiate_mutation(m)
+            newnode.mutations.push_back(newmut)
+        for a in annotations:
+            newnode.clade_annotations.push_back(a)
+        
+
+    def move_node(self, to_move: str, new_parent: str) -> None:
+        """Move a node from its current parent to a new parent. 
+
+        Args:
+            to_move (str): The identifier of the node to move.
+
+            new_parent (str): The identifier of the new parent of the node.
+        """
+        self.t.move_node(to_move.encode("UTF-8"), new_parent.encode("UTF-8"), True)
+
+    def remove_node(self, to_remove: str) -> None:
+        """Remove a node from the tree. This is a destructive operation.
+
+        Args:
+            to_remove (str): The identifier of the node to remove.
+        """
+        self.t.remove_node(to_remove.encode("UTF-8"), True)
+
+    def apply_annotations(self, annotations: dict[str,list[str]]) -> None:
+        """Apply annotations to the tree. Replaces any annotations on nodes affected.
+
+        Args:
+            annotations (dict[str,list[str]]): A dictionary of annotations to apply to the tree. No more than two annotations per node.
+        """
+        cdef Node* node
+        for nid, annv in annotations.items():
+            if len(annv) > 2:
+                raise ValueError("Cannot have more than 2 annotations per node due to internal implementation limitations.")
+            node = self.t.get_node(nid.encode("UTF-8"))
+            node.clade_annotations.clear()
+            for an in annv:
+                node.clade_annotations.push_back(an.encode("UTF-8"))
