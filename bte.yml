@@ -1,0 +1,9 @@
+name: bte
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.8
+  - boost-cpp=1.73.0
+  - cython
+  - protobuf=3.19
+  - tbb-devel=2019.0
