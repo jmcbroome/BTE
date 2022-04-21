@@ -78,7 +78,9 @@ class TestMat(unittest.TestCase):
     def test_node_manipulation(self):
         t.create_node("node_X",t.root.id)
         self.assertTrue(t.get_node("node_X").parent.id == t.root.id)
+        self.assertTrue("node_X" in [c.id for c in t.root.children])
         t.create_node("node_Y",t.root.id)
-        t.move_node("node_X","node_Y")
-        self.assertTrue(t.get_node("node_X").parent.id == "node_Y")
-        t.remove_node("node_Y")
+        t.move_node("node_Y","node_X")
+        self.assertTrue(t.get_node("node_Y").parent.id == "node_X")
+        t.remove_node("node_X")
+        self.assertTrue("node_X" not in [c.id for c in t.root.children])

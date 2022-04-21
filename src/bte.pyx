@@ -60,22 +60,19 @@ cdef class MATNode:
         Can optionally have mutations loaded as well. By default, creates a MATNode wrapper with no associated Node.
 
         args:
-            tree: MATree object to add the node to.
+            tree (MATree): MATree object to add the node to.
 
-            parent: The identifier of the parent Node.
+            parent (str): The identifier of the parent Node.
 
-            identifier: The identifier to use for the Node. Must be unique.
+            identifier (str): The identifier to use for the Node. Must be unique.
 
-            mutations: A list of mutations to apply to the Node. Optional.
+            mutations (list[str]): A list of mutations to apply to the Node. Optional.
 
-            annotations: A list of annotations to apply to the Node. Optional.
+            annotations (list[str]): A list of annotations to apply to the Node. Optional.
         """
-
-        if identifier != "" and parent != None:
+        if tree != None and identifier != "" and parent != None:
             tree.create_node(identifier, parent, mutations, annotations)
             self.n = tree.t.get_node(identifier.encode("UTF-8"))
-            if len(mutations) > 0:
-                self.update_mutations(mutations)
 
     cdef from_node(self, bte.Node* n):
         """"
@@ -1016,7 +1013,9 @@ cdef class MATree:
         return clades
 
     def create_node(self, identifier: str, parent_id: str, mutations: list[str] = [], annotations = []):
-        """Create a new node and place it in the tree.
+        """Create a new node and place it in the tree without generating a wrapper.
+        This does not return a MATNode object, so access to the created node will require a subsequent 
+        get_node call or using the MATNode constructor method to add the node to the tree.
 
         Args:
             identifer (str): The identifier of the new node.
