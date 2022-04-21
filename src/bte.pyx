@@ -1116,7 +1116,8 @@ cdef class MATree:
 
     def translate(self,gtf_file,fasta_file):
         """
-        Translate amino acid changes across the tree and return the results as a dictionary of node IDs and change strings as returned from matUtils translate. 
+        Translate amino acid changes across the tree and return the results as a dictionary of node IDs and class objects representing amino acid changes as returned from matUtils translate. 
+        The translation is representative of the tree at the time of this function being called only.
 
         Args:
             gtf_file (str): The path to the GTF file containing gene information. 

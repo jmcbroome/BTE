@@ -100,13 +100,11 @@ cdef extern from "usher/src/usher_graph.hpp" nogil:
         pass
 cdef extern from "usher/src/usher_mapper.cpp" nogil:
     pass
-cdef extern from "parsimony.pb.h" nogil:
-    pass
 cdef extern from "parsimony.pb.cc" nogil:
     pass
 cdef extern from "usher/src/matUtils/common.hpp" nogil:
     pass
-cdef extern from "timer.cpp" nogil:
+cdef extern from "additional.cpp" nogil:
     vector[pair[string,string]] do_translation(Tree* T, string gtf_file, string fasta_file) except +
 cdef extern from "usher/src/matUtils/select.cpp" nogil:
     vector[string] get_clade_samples(Tree* T, string clade_name) except + 
