@@ -1,8 +1,8 @@
 name: bte
 channels:
   - conda-forge
-  - anaconda
 dependencies:
+  - python=3.10
   - boost-cpp=1.73.0
   - cython
   - autoconf
