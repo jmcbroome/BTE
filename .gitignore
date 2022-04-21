@@ -12,3 +12,5 @@ build/*.o
 *html
 *ipynb
 __pycache__/*
+*fa
+*gtf
