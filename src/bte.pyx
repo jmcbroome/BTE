@@ -1126,5 +1126,5 @@ cdef class MATree:
         translation_table = {}
         cdef vector[pair[string,string]] changes = bte.do_translation(&self.t,gtf_file.encode("UTF-8"),fasta_file.encode("UTF-8"))
         for i in range(changes.size()):
-            translation_table[changes[i].first.decode("UTF-8")] = changes[i].second.decode("UTF-8")
+            translation_table[changes[i].first.decode("UTF-8")] = _generate_translations(changes[i].second.decode("UTF-8"))
         return translation_table
