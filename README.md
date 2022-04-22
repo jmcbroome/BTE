@@ -88,8 +88,7 @@ conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=201
 When building your own environment, you will also need the general suite of C++ compiler tools. On a mac, you may need xcode CLI. On linux, you may need other compiler tools. You may need to call 
 
 ```
-conda install -c conda-forge cxx-compiler
-conda install -c anaconda make 
+conda install -c conda-forge -c anaconda cxx-compiler make
 ```
 
 ### Building the Python-importable library
