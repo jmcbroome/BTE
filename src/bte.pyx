@@ -72,6 +72,17 @@ class AAChange:
         else:
             return False
 
+    def aa_string(self):
+        return self.gene + ":" + self.aa
+
+    def __repr__(self):
+        fstr = ""
+        fstr += "gene: " + self.gene + "\n"
+        fstr += "aa: " + self.aa + "\n"
+        fstr += "nuc: " + self.nuc + "\n"
+        fstr += "codon: " + self.codons + "\n"
+        return fstr
+
 def _generate_translations(transtr):
     """
     Convert an amino acid translation string to a list containing AAChange objects.
@@ -185,6 +196,15 @@ cdef class MATNode:
             newmut = instantiate_mutation(mstr)
             self.n.mutations.push_back(newmut)
 
+    def __repr__(self):
+        fstr = ""
+        fstr += "id: " + self.id + "\n"
+        fstr += "parent: " + str(self.parent.id) + "\n"
+        fstr += "children: " + str([c.id for c in self.children]) + "\n"
+        fstr += "mutations: " + str(self.mutations) + "\n"
+        fstr += "annotations: " + str(self.annotations) + "\n"
+        return fstr
+
 cdef complement(int8_t input):
     if input == 0b1:
         return 0b1000
@@ -258,6 +278,9 @@ cdef class MATree:
             else:
                 self.t = bte.Tree()
     
+    def __repr__(self):
+        return "MATree object with " + str(self.t.get_num_leaves(self.t.root)) + " leaves."
+
     def clear(self) -> None:
         """
         Call this function to explicitly deallocate all tree memory. Use when the tree object is no longer necessary 
