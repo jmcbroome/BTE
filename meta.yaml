@@ -14,7 +14,7 @@ requirements:
     - python
     - make
     - setuptools
-    - "{{ compiler('cxx') }}"
+    - {{ compiler('cxx') }}
     - cython
     - boost-cpp=1.73.0
     - protobuf=3.19
