@@ -14,3 +14,5 @@ build/*.o
 __pycache__/*
 *fa
 *gtf
+*yaml
+*sh
