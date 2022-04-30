@@ -14,3 +14,6 @@ build/*.o
 __pycache__/*
 *fa
 *gtf
+*sh
+*yaml
+*tar.gz
