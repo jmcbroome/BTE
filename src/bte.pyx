@@ -12,6 +12,7 @@ from libcpp cimport bool as cbool
 import functools
 import time
 from typing import Optional, Union
+import sys
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -20,7 +21,7 @@ def _timer(func, *args, **kwargs):
         retval = func(*args,**kwargs)
         end = time.perf_counter()
         rt = end-start
-        print(f"Finished {func.__name__!r} in {round(rt,4)} seconds")
+        print(f"Finished {func.__name__!r} in {round(rt,4)} seconds",file=sys.stderr)
         return retval
     return timer_wrap
 
@@ -143,6 +144,8 @@ cdef class MATNode:
         will be loaded automatically into python attributes and relational attributes to other nodes can be accessed through fetch methods 
         to the C++ class attributes.
         """
+        if n == cython.NULL:
+            raise ValueError("Parent node is null- are you trying to take the parent of the root?")
         self.n = n
         return self
 
@@ -263,7 +266,7 @@ cdef class MATree:
         self._empty = False
         if pb_file != None:
             if nwk_file != None or vcf_file != None or nwk_string != None:
-                print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring")
+                print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring",file=sys.stderr)
             if pb_file[-3:] == ".pb" or pb_file[-6:] == ".pb.gz":
                 self.from_pb(pb_file,uncondense)
             else:
@@ -272,7 +275,7 @@ cdef class MATree:
             self.from_json(json_file)
         elif nwk_string != None:
             if vcf_file != None:
-                print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.")
+                print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.",file=sys.stderr)
             self.t = bte.create_tree_from_newick_string(nwk_string.encode("UTF-8"))
             self._tree_only = True
         else:
@@ -688,12 +691,12 @@ cdef class MATree:
         Returns:
             MATree: the subtree representing that clade.
         """
-        print("Getting clade: " + clade_id)
+        print("Getting clade: " + clade_id,file=sys.stderr)
         cdef vector[string] samples = self.get_clade_samples(clade_id)
         if samples.size() == 0:
-            print("Error: requested clade not found.")
+            print("Error: requested clade not found.",file=sys.stderr)
             return None
-        print("Successfully found {} samples.".format(len(samples)))
+        print("Successfully found {} samples.".format(len(samples)),file=sys.stderr)
         return self.get_subtree(samples)
 
     cpdef vector[string] get_regex_samples(self, regexstr: str):
@@ -721,9 +724,9 @@ cdef class MATree:
         """
         cdef vector[string] samples = self.get_regex_samples(regexstr)
         if samples.size() == 0:
-            print("Error: requested regex does not match any samples.")
+            print("Error: requested regex does not match any samples.",file=sys.stderr)
             return None
-        print("Successfully found {} samples.".format(len(samples)))
+        print("Successfully found {} samples.".format(len(samples)),file=sys.stderr)
         return self.get_subtree(samples)
 
     def get_random(self, size: int, current_samples: list = [], lca_limit: bool = False) -> MATree:
@@ -993,11 +996,11 @@ cdef class MATree:
         #this algorithm traverses the tree in postorder (reverse depth-first)
         #it requires that the tree be fully resolved and bifurcating, so that's the first step.
         #note on efficiency- we're using Python dicts to do most of the set logic, which are slower than using native C++ objects
-        print("Resolving polytomies...")
+        print("Resolving polytomies...",file=sys.stderr)
         self.resolve_all_polytomies()
         #initialize node assignments with leaf states
         node_assignment_set = {l:set(v) for l,v in leaf_assignments.items()}
-        print("{} initial assignments".format(len(node_assignment_set)))
+        print("{} initial assignments".format(len(node_assignment_set)),file=sys.stderr)
         #first, a postorder traversal. We implement this here by generating nodes in depth-first order and proceeding 
         #to iterate through their indeces in reverse.
         cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
@@ -1038,7 +1041,7 @@ cdef class MATree:
                         final_node_assignment[cnode.identifier.decode("UTF-8")] = list(current_state)[0]
                     else:
                         final_node_assignment[cnode.identifier.decode("UTF-8")] = parent_state
-        print("{} final assignments".format(len(final_node_assignment)))
+        print("{} final assignments".format(len(final_node_assignment)),file=sys.stderr)
         return final_node_assignment
 
     def ladderize(self) -> None:
