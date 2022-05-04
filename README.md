@@ -26,10 +26,10 @@ This package is for you!
 
 ## Quickstart
 
-If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda with the following:
+If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda. We serve on both the bioconda channel and on my personal anaconda channel (-c jmcbroome).
 
 ```
-conda install -c jmcbroome bte
+conda install -c bioconda bte
 ```
 
 Download the latest public SARS-CoV-2 tree:
