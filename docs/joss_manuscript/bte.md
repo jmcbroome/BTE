@@ -6,19 +6,19 @@
     - Cython
 # authors:
     - Jakob McBroome^[Corresponding Author]
-        orcid: 0000-0002-5002-5156
-        affiliation: 1 
+      orcid: 0000-0002-5002-5156
+      affiliation: 1 
     - Yatish Turakhia
-        orcid:  0000-0001-5600-2900 
-        affiliation: 2 
+      orcid:  0000-0001-5600-2900 
+      affiliation: 2 
     - Russell Corbett-Detig        
-        orcid:  0000-0001-6535-2478 
-        affiliation: 1 
+      orcid:  0000-0001-6535-2478 
+      affiliation: 1 
 # affiliations:
     - name: University of California Santa Cruz, USA
-        index: 1
+      index: 1
     - name: University of California San Diego, USA
-        index: 2
+      index: 2
 # date: 9 May 2022
 # bibiography: bte.bib
 
