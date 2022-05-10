@@ -1,5 +1,5 @@
 # BIG TREE EXPLORER (BTE)
-Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher) (In Early Development). Developer version distributed as source. 
+Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher). 
 
 # Overview
 This repository will allow the user to leverage the power of the Mutation Annotated Tree file format and library in their Python scripts, allowing for efficient and effective analysis of global SARS-CoV-2 and other pathogen phylogenies. 
@@ -47,13 +47,13 @@ tree = bte.MATree("public-latest.all.masked.pb.gz")
 
 ### A Note on Versions and Architectures
 
-We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda or my personal channel jmcbroome. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extesnion using the instructions below.
+We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda or my personal channel `jmcbroome`. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
 
 ## Build From Source Instructions
 
-You may need to build this library from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version.
+You may need to build this library from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version. 
 
-### First Time Setup
+### Set Up Build Environment
 
 This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. 
 
@@ -77,7 +77,7 @@ conda env create -f bte.yml
 conda activate bte
 ```
 
-### Building the Python-importable library
+### Compile and Build Module
 
 Once all libraries are available, proceed to compile the shared object file (.so).
 
@@ -103,7 +103,7 @@ python3 -m unittest run_test.py
 
 ### Installation from `conda` Channel
 
-BTE, as a python extension, is python version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a fixed version of Python and install BTE there.
+BTE, as a python extension, is python version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a supported version of Python and install BTE there.
 
 ```
 conda create --name bte -c conda-forge -c bioconda bte python=3.8
