@@ -12,7 +12,8 @@ jobs:
         with:
           journal: joss
           paper-path: docs/joss_manuscript/bte.md
-      - run: ls -la
+      - run: ls -la docs/joss_manuscript
+      - run: ls -la ${{github.workspace}}
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
@@ -20,4 +21,4 @@ jobs:
           # This is the output path where Pandoc will write the compiled
           # PDF. Note, this should be the same directory as the input
           # paper.md
-          path: ${{github.workspace}}/docs/joss_manuscript/bte.pdf
+          path: ${{github.workspace}}/docs/joss_manuscript
