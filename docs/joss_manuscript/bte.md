@@ -24,7 +24,7 @@ affiliations:
  - name: Department of Electrical and Computer Engineering, University of California, San Diego; San Diego, CA 92093, USA
    index: 3
 date: "9 May 2022"
-bibliography: docs/joss_manuscript/bte.bib
+bibliography: bte.bib
 ---
 
 # Summary
