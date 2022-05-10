@@ -5,21 +5,24 @@ tags:
     - phylogenetics
     - epidemiology
     - Cython
+    - SARS-CoV-2
 authors:
     - name: Jakob McBroome^[Corresponding Author]
       orcid: 0000-0002-5002-5156
-      affiliation: 1 
+      affiliation: "1, 2" 
     - name: Yatish Turakhia
       orcid:  0000-0001-5600-2900 
-      affiliation: 2 
+      affiliation: "3" 
     - name: Russell Corbett-Detig        
       orcid:  0000-0001-6535-2478 
-      affiliation: 1 
+      affiliation: "1, 2" 
 affiliations:
-    - name: University of California Santa Cruz, USA
-      index: 1
-    - name: University of California San Diego, USA
-      index: 2
+ - name: Department of Biomolecular Engineering, University of California Santa Cruz. Santa Cruz, CA 95064, USA
+   index: 1
+ - name: Genomics Institute, University of California Santa Cruz, Santa Cruz, CA 95064, USA
+   index: 2
+ - name: Department of Electrical and Computer Engineering, University of California, San Diego; San Diego, CA 92093, USA
+   index: 3
 date: 9 May 2022
 bibiography: bte.bib
 ---
