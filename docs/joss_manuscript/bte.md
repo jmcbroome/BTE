@@ -24,7 +24,7 @@ affiliations:
  - name: Department of Electrical and Computer Engineering, University of California, San Diego; San Diego, CA 92093, USA
    index: 3
 date: "9 May 2022"
-bibiography: "docs/joss_manuscript/bte.bib"
+bibiography: bte.bib
 ---
 
 # Summary
@@ -43,7 +43,7 @@ While there are multiple Python packages for phylogenetics available [@huerta-ce
 
 We compared performance of `BTE` as compared to two other popular packages for Python phylogenetics, ETE3 and Biopython.Phylo [@huerta-cepas_ete_2016; @talevich_biophylo_2012]. Benchmarking was performed by extracting random subtrees of the specified size from one of UCSC’s global SARS-CoV-2 MATs, converting the subtree to Newick format, and performing the specified operation with each package. We both tracked total computation time and profiled memory use for each tool. Generally, BTE loads and traverses a tree more quickly than competitors, with a particular advantage at large tree sizes. It also has a substantially improved implementation for identifying the ancestors associated with a given node, with multiple orders of magnitude improvement. In terms of memory use, it is generally comparable to both ETE3 and Biopython.Phylo, with memory use ranging in the dozens of Kb for most operations, with up to a few hundred Mb for loading and large subtreeing operations. All code for benchmarking is available at a dedicated [repository](https://github.com/jmcbroome/bte-benchmark).
 
-![Figure 1: Runtime Comparison. A: Time to load a tree of the indicated size from disk. B: Time to traverse a tree of the indicated size. C: Time to trace the complete ancestry of a single randomly selected leaf. \label{fig:bench}](benchmark_figure.png)
+![Runtime Comparison. A: Time to load a tree of the indicated size from disk. B: Time to traverse a tree of the indicated size. C: Time to trace the complete ancestry of a single randomly selected leaf. \label{fig:bench}](benchmark_figure.png)
 
 # Acknowledgements
 
