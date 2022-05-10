@@ -47,7 +47,7 @@ tree = bte.MATree("public-latest.all.masked.pb.gz")
 
 ### A Note on Versions and Architectures
 
-We provide conda builds for Linux and MacOS at this time, using slightly different versions of Python (3.9 and 3.8 respectively, due to dependency conflicts). If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem.
+We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda or my personal channel jmcbroome. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extesnion using the instructions below.
 
 ## Build From Source Instructions
 
@@ -77,20 +77,6 @@ conda env create -f bte.yml
 conda activate bte
 ```
 
-If the .yml isn't working for you, you can try:
-
-```
-conda create --name bte
-conda activate bte
-conda install -c conda-forge -c anaconda protobuf boost-cpp cython tbb-devel=2019.0
-```
-
-When building your own environment, you will also need the general suite of C++ compiler tools. On a mac, you may need xcode CLI. On linux, you may need other compiler tools. You may need to call 
-
-```
-conda install -c conda-forge -c anaconda cxx-compiler make
-```
-
 ### Building the Python-importable library
 
 Once all libraries are available, proceed to compile the shared object file (.so).
@@ -111,4 +97,22 @@ We provide a unit test script you can use to validate that the library is functi
 
 ```
 python3 -m unittest run_test.py
+```
+
+## Installation Issues
+
+### Installation from `conda` Channel
+
+BTE, as a python extension, is python version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a fixed version of Python and install BTE there.
+
+```
+conda create --name bte -c conda-forge -c bioconda bte python=3.8
+```
+
+### Installation by Local Build
+
+If you're having trouble compiling a local extension (using setup.py), you need the general suite of C++ compiler tools. On a mac, you may need xcode CLI. On linux, you may need other compiler tools. You may need to call 
+
+```
+conda install -c conda-forge -c anaconda cxx-compiler make
 ```
