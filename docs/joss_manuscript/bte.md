@@ -1,10 +1,11 @@
-# title: 'BTE: a Python extension for pandemic-scale phylogenetics"
-# tags:
+---
+title: 'BTE: a Python extension for pandemic-scale phylogenetics"
+tags:
     - Python
     - phylogenetics
     - epidemiology
     - Cython
-# authors:
+authors:
     - name: Jakob McBroome^[Corresponding Author]
       orcid: 0000-0002-5002-5156
       affiliation: 1 
@@ -14,13 +15,14 @@
     - name: Russell Corbett-Detig        
       orcid:  0000-0001-6535-2478 
       affiliation: 1 
-# affiliations:
+affiliations:
     - name: University of California Santa Cruz, USA
       index: 1
     - name: University of California San Diego, USA
       index: 2
-# date: 9 May 2022
-# bibiography: bte.bib
+date: 9 May 2022
+bibiography: bte.bib
+---
 
 # Summary
 
