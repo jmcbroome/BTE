@@ -1,5 +1,5 @@
 ---
-title: 'BTE: a Python extension for pandemic-scale phylogenetics"
+title: 'BTE: a Python extension for pandemic-scale phylogenetics'
 tags:
     - Python
     - phylogenetics
