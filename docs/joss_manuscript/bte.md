@@ -5,13 +5,13 @@
     - epidemiology
     - Cython
 # authors:
-    - Jakob McBroome^[Corresponding Author]
+    - name: Jakob McBroome^[Corresponding Author]
       orcid: 0000-0002-5002-5156
       affiliation: 1 
-    - Yatish Turakhia
+    - name: Yatish Turakhia
       orcid:  0000-0001-5600-2900 
       affiliation: 2 
-    - Russell Corbett-Detig        
+    - name: Russell Corbett-Detig        
       orcid:  0000-0001-6535-2478 
       affiliation: 1 
 # affiliations:
