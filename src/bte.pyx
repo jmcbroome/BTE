@@ -1148,6 +1148,21 @@ cdef class MATree:
             node.clade_annotations.clear()
             for an in annv:
                 node.clade_annotations.push_back(an.encode("UTF-8"))
+        
+    def dump_annotations(self) -> dict[str,list[str]]:
+        """Return a dictionary of all annotations on the tree with the internal nodes they are currently defined by.
+
+        Returns:
+            dict[str,list[str]]: A dictionary of annotations with the root node they are attached to.
+        """
+        claderoots = {}
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        cdef vector[string] anns
+        for i in range(nodes.size()):
+            anns = nodes[i].clade_annotations
+            for j in range(anns.size()):
+                if anns[j].size() > 0:
+                    claderoots[anns[j].decode("UTF-8")] = nodes[i].identifier.decode("UTF-8")
 
     def translate(self, gtf_file: str, fasta_file: str) -> dict[str,list[AAChange]]:
         """
