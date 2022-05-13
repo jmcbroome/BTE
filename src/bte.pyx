@@ -156,6 +156,10 @@ cdef class MATNode:
         return self.n.is_leaf()
 
     @property
+    def level(self):
+        return self.n.level
+
+    @property
     def id(self):
         return self.n.identifier.decode("UTF-8")
 
@@ -211,6 +215,7 @@ cdef class MATNode:
     def __repr__(self):
         fstr = ""
         fstr += "id: " + self.id + "\n"
+        fstr += "level: " + str(self.level) + "\n"
         fstr += "parent: " + str(self.parent.id) + "\n"
         fstr += "children: " + str([c.id for c in self.children]) + "\n"
         fstr += "mutations: " + str(self.mutations) + "\n"
@@ -848,13 +853,13 @@ cdef class MATree:
 
     @_check_newick_only
     def mutation_set(self, nid: str) -> set[str]:
-        """Return the complete set of mutations (genotype) the indicated node has with respect to the reference. 
+        """Return the complete set of mutations (haplotype) the indicated node has with respect to the reference. 
 
         Args:
-            nid (str): The target node to get the genotype for.
+            nid (str): The target node to get the haplotype for.
 
         Returns:
-            set[str]: the genotype of the node.
+            set[str]: the haplotype of the node.
         """
         pyset = set()
         cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid.encode("UTF-8"))
