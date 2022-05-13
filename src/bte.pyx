@@ -1163,6 +1163,7 @@ cdef class MATree:
             for j in range(anns.size()):
                 if anns[j].size() > 0:
                     claderoots[anns[j].decode("UTF-8")] = nodes[i].identifier.decode("UTF-8")
+        return claderoots
 
     def translate(self, gtf_file: str, fasta_file: str) -> dict[str,list[AAChange]]:
         """
