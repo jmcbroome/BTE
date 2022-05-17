@@ -682,7 +682,7 @@ cdef class MATree:
             clade_id (str): Clade to find.
 
         Returns:
-            list[str]: List of sample IDs which are members of the indicated clade.
+            list[bytes]: List of sample IDs which are members of the indicated clade.
         """
         cdef vector[string] samples = bte.get_clade_samples(&self.t, clade_id.encode("UTF-8"))
         return samples
@@ -711,7 +711,7 @@ cdef class MATree:
             regexstr (str): The regex pattern to match.
 
         Returns:
-            list[str]: List of sample IDs.
+            list[bytes]: List of sample IDs.
         """        
         #the C++ allows for a preselection of samples, but we don't use that option.
         cdef vector[string] to_check = []
@@ -765,7 +765,7 @@ cdef class MATree:
             mutation (str): string representation of the mutation in reflocalt format (e.g. "A123C").
 
         Returns:
-            list[str]: samples with the mutation.
+            list[bytes]: samples with the mutation.
         """    
         #can't use the error decorator for this function since it is cpdef.
         if self._tree_only:
@@ -851,15 +851,29 @@ cdef class MATree:
                     allm.insert(m)
         return allm
 
-    @_check_newick_only
     def mutation_set(self, nid: str) -> set[str]:
+        """Return the complete set of mutations (haplotype) the indicated node has with respect to the reference. 
+        DEPRECATED in favor of get_haplotype, which is equivalent functionally.
+
+        Args:
+            nid (str): The target node to get the haplotype for.
+
+        Returns:
+            set[str]: the haplotype of the node, represented as a set of mutations formatted in reflocalt (e.g. A123G) format.
+        """
+        #Deprecated; use get_haplotype instead.
+        print("WARNING: mutation_set is deprecated. Use get_haplotype instead, which has the same functionality.", file=sys.stderr)
+        return self.get_haplotype(nid)
+
+    @_check_newick_only
+    def get_haplotype(self, nid: str) -> set[str]:
         """Return the complete set of mutations (haplotype) the indicated node has with respect to the reference. 
 
         Args:
             nid (str): The target node to get the haplotype for.
 
         Returns:
-            set[str]: the haplotype of the node.
+            set[str]: the haplotype of the node, represented as a set of mutations formatted in reflocalt (e.g. A123G) format.
         """
         pyset = set()
         cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid.encode("UTF-8"))
