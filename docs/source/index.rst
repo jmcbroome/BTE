@@ -24,7 +24,7 @@ Installation
 
 On Mac or Linux, you can install BTE by running the following command:
 
-      conda install -c jmcbroome bte
+      conda install -c bioconda bte
 
 See the README if you encounter installation difficulties or need to build a local version of the extension.
 

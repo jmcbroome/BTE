@@ -45,7 +45,7 @@ generally causing inconvenience and slowing both development and runtime. BTE st
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>On Mac or Linux, you can install BTE by running the following command:</p>
 <blockquote>
-<div><p>conda install -c jmcbroome bte</p>
+<div><p>conda install -c bioconda bte</p>
 </div></blockquote>
 <p>See the README if you encounter installation difficulties or need to build a local version of the extension.</p>
 </section>
@@ -243,6 +243,16 @@ By default, traverses the whole tree. Set reverse to true to traverse in postord
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="bte.MATree.dump_annotations">
+<span class="sig-name descname"><span class="pre">dump_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.dump_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of all annotations on the tree with the internal nodes they are currently defined by.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict[str,list[str]]: A dictionary of annotations with the root node they are attached to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.from_json">
 <span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">jsonf:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.from_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a mat from a json compatible with the Auspice.us visualization web tool.</p>
@@ -313,7 +323,19 @@ By default, traverses the whole tree. Set reverse to true to traverse in postord
 <dl class="simple">
 <dt>Args:</dt><dd><p>clade_id (str): Clade to find.</p>
 </dd>
-<dt>Returns:</dt><dd><p>list[str]: List of sample IDs which are members of the indicated clade.</p>
+<dt>Returns:</dt><dd><p>list[bytes]: List of sample IDs which are members of the indicated clade.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bte.MATree.get_haplotype">
+<span class="sig-name descname"><span class="pre">get_haplotype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">nid:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.get_haplotype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the complete set of mutations (haplotype) the indicated node has with respect to the reference.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>nid (str): The target node to get the haplotype for.</p>
+</dd>
+<dt>Returns:</dt><dd><p>set[str]: the haplotype of the node, represented as a set of mutations formatted in reflocalt (e.g. A123G) format.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -361,7 +383,7 @@ By default, traverses the whole tree. Set reverse to true to traverse in postord
 <dl class="simple">
 <dt>Args:</dt><dd><p>mutation (str): string representation of the mutation in reflocalt format (e.g. &quot;A123C&quot;).</p>
 </dd>
-<dt>Returns:</dt><dd><p>list[str]: samples with the mutation.</p>
+<dt>Returns:</dt><dd><p>list[bytes]: samples with the mutation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -424,7 +446,7 @@ Selects as many as possible if not enough are available.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>regexstr (str): The regex pattern to match.</p>
 </dd>
-<dt>Returns:</dt><dd><p>list[str]: List of sample IDs.</p>
+<dt>Returns:</dt><dd><p>list[bytes]: List of sample IDs.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -459,11 +481,12 @@ Selects as many as possible if not enough are available.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.mutation_set">
 <span class="sig-name descname"><span class="pre">mutation_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">nid:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.mutation_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the complete set of mutations (genotype) the indicated node has with respect to the reference.</p>
+<dd><p>Return the complete set of mutations (haplotype) the indicated node has with respect to the reference. 
+DEPRECATED in favor of get_haplotype, which is equivalent functionally.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>nid (str): The target node to get the genotype for.</p>
+<dt>Args:</dt><dd><p>nid (str): The target node to get the haplotype for.</p>
 </dd>
-<dt>Returns:</dt><dd><p>set[str]: the genotype of the node.</p>
+<dt>Returns:</dt><dd><p>set[str]: the haplotype of the node, represented as a set of mutations formatted in reflocalt (e.g. A123G) format.</p>
 </dd>
 </dl>
 </dd></dl>
