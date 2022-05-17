@@ -2,9 +2,9 @@
 Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher). 
 
 # Overview
-This repository will allow the user to leverage the power of the Mutation Annotated Tree file format and library in their Python scripts, allowing for efficient and effective analysis of global SARS-CoV-2 and other pathogen phylogenies. 
+This package will allow the user to leverage the power of the Mutation Annotated Tree file format and library in their Python scripts, allowing for efficient and effective analysis of global SARS-CoV-2 and other pathogen phylogenies. 
 
-This tool is generally intended as a replacement for ETE3, Biopython.Phylo, and similar Python phylogenetics packages for Mutation Annotated Trees (MATs). Using standard packages with MATs requires conversion to newick and the maintenance of mutation annotations as a separate data structure, generally causing inconvenience and slowing both development and runtime. BTE streamlines this process by exposing the heavily optimized MAT library underlying UShER and matUtils to Python, allowing for efficient and convenient use of MATs in a Python development environment!
+This package is generally intended as a replacement for ETE3, Biopython.Phylo, and similar Python phylogenetics packages for Mutation Annotated Trees (MATs). Using standard packages with MATs requires conversion to newick and the maintenance of mutation annotations as a separate data structure, generally causing inconvenience and slowing both development and runtime. BTE streamlines this process by exposing the heavily optimized MAT library underlying UShER and matUtils to Python, allowing for efficient and convenient use of MATs in a Python development environment!
 
 UCSC maintains a repository, updated each day, containing the complete and latest publicly-available global SARS-CoV-2 phylogenetic tree in MAT protobuf format [here](http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/). To try out this tool, download the latest tree, build the library, and jump straight to your Python analysis!
 
@@ -51,11 +51,11 @@ We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from
 
 ## Build From Source Instructions
 
-You may need to build this library from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version. 
+You may need to build this package from source if you are adding functionality, on a currently unsupported architecture, on an unsupported version of Python, or just if you want the latest and greatest version. 
 
 ### Set Up Build Environment
 
-This project is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. 
+This package is dependent on a few key libraries that need to be available for linking. We use conda for environment management, so you will need miniconda or anaconda. 
 
 The first step is to clone this repository. This repository relies on UShER as a submodule dependency, so --recurse-submodules
 needs to be added to the call.
@@ -93,7 +93,7 @@ import bte
 
 From a script in the same directory as the .so!
 
-We provide a unit test script you can use to validate that the library is functioning as intended.
+We provide a unit test script you can use to validate that the package is functioning as intended.
 
 ```
 python3 -m unittest run_test.py
