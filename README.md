@@ -26,7 +26,7 @@ This package is for you!
 
 ## Quickstart
 
-If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda. We serve on both the bioconda channel and on my personal anaconda channel (-c jmcbroome).
+If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda, via the bioconda channel.
 
 ```
 conda install -c bioconda bte
@@ -47,7 +47,7 @@ tree = bte.MATree("public-latest.all.masked.pb.gz")
 
 ### A Note on Versions and Architectures
 
-We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda or my personal channel `jmcbroome`. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
+We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
 
 ## Build From Source Instructions
 
