@@ -26,7 +26,7 @@ This package is for you!
 
 ## Quickstart
 
-If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package from conda. We serve on both the bioconda channel and on my personal anaconda channel (-c jmcbroome).
+If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package via the bioconda channel.
 
 ```
 conda install -c bioconda bte
@@ -47,7 +47,7 @@ tree = bte.MATree("public-latest.all.masked.pb.gz")
 
 ### A Note on Versions and Architectures
 
-We provide conda builds for Linux and MacOS at this time, for Python >=3.8, from bioconda or my personal channel `jmcbroome`. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
+We provide conda builds for Linux and MacOS with Python versions >=3.8. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
 
 ## Build From Source Instructions
 
@@ -103,7 +103,7 @@ python3 -m unittest run_test.py
 
 ### Installation from `conda` Channel
 
-BTE, as a python extension, is python version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a supported version of Python and install BTE there.
+BTE, as a python extension, is version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a supported version of Python and install BTE there.
 
 ```
 conda create --name bte -c conda-forge -c bioconda bte python=3.8
