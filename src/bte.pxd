@@ -47,9 +47,9 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
         size_t get_max_level() const
         size_t get_num_annotations() const
         void rename_node(string old_nid, string new_nid) except +
-        vector[Node*] get_leaves(string nid)
-        vector[string] get_leaves_ids(string nid)
-        size_t get_num_leaves(Node* node)
+        vector[Node*] get_leaves(string nid) except + 
+        vector[string] get_leaves_ids(string nid) except + 
+        size_t get_num_leaves(Node* node) except + 
         Node* create_node (string identifier, string parent_id, float branch_length) except +
         Node* get_node (string identifier) const
         bool is_ancestor (string anc_id, string nid) const
@@ -58,7 +58,7 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
         void remove_node (string nid, bool move_level) except +
         void remove_single_child_nodes()
         void move_node (string source, string destination, bool move_level) except +
-        vector[Node*] breadth_first_expansion(string nid)
+        vector[Node*] breadth_first_expansion(string nid)  except + 
         vector[Node*] depth_first_expansion(Node* node) const
         size_t get_parsimony_score()
 

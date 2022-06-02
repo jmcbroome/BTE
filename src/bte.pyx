@@ -166,8 +166,11 @@ cdef class MATNode:
     @property
     def parent(self):
         pn = MATNode()
-        pn.from_node(self.n.parent)
-        return pn
+        if self.n.parent != cython.NULL:
+            pn.from_node(self.n.parent)
+            return pn
+        else:
+            return None
 
     @property
     def children(self):
@@ -216,7 +219,10 @@ cdef class MATNode:
         fstr = ""
         fstr += "id: " + self.id + "\n"
         fstr += "level: " + str(self.level) + "\n"
-        fstr += "parent: " + str(self.parent.id) + "\n"
+        if self.n.parent != cython.NULL:
+            fstr += "parent: " + self.parent.id + "\n"
+        else:
+            fstr += "parent: None\n"
         fstr += "children: " + str([c.id for c in self.children]) + "\n"
         fstr += "mutations: " + str(self.mutations) + "\n"
         fstr += "annotations: " + str(self.annotations) + "\n"
