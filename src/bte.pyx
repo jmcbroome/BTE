@@ -187,20 +187,7 @@ cdef class MATNode:
 
     @property
     def annotations(self):
-        cdef bte.Node* ancestor = self.n
-        cdef size_t anncount = self.n.clade_annotations.size()
-        cdef vector[string] annotes 
-        cdef size_t k
-        annotations = [None for i in range(anncount)]
-        while all([a==None for a in annotations]):
-            annotes = ancestor.clade_annotations
-            for k in range(annotes.size()):
-                if annotes[k].size() > 0 and (annotations[k] == None):
-                    annotations[k] = annotes[k].decode("UTF-8")
-            if ancestor.parent == cython.NULL:
-                break
-            ancestor = ancestor.parent
-        return annotations
+        return [a.get_string().decode("UTF-8") for a in self.n.clade_annotations]
             
     def update_mutations(self, mutation_list: list[str]):
         """Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
