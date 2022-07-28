@@ -187,7 +187,7 @@ cdef class MATNode:
 
     @property
     def annotations(self):
-        return [a.get_string().decode("UTF-8") for a in self.n.clade_annotations]
+        return [a.decode("UTF-8") for a in self.n.clade_annotations]
             
     def update_mutations(self, mutation_list: list[str]):
         """Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
