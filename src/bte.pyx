@@ -188,7 +188,25 @@ cdef class MATNode:
     @property
     def annotations(self):
         return [a.decode("UTF-8") for a in self.n.clade_annotations]
-            
+
+    def most_recent_annotation(self):
+        """Find the most recent clade annotations for the node in the node's ancestry.
+        """      
+        cdef bte.Node* ancestor = self.n
+        cdef size_t anncount = self.n.clade_annotations.size()
+        cdef vector[string] annotes 
+        cdef size_t k
+        annotations = [None for i in range(anncount)]
+        while any([a==None for a in annotations]):
+            annotes = ancestor.clade_annotations
+            for k in range(annotes.size()):
+                if annotes[k].size() > 0 and (annotations[k] == None):
+                    annotations[k] = annotes[k].decode("UTF-8")
+            if ancestor.parent == cython.NULL:
+                break
+            ancestor = ancestor.parent
+        return annotations
+
     def update_mutations(self, mutation_list: list[str]):
         """Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
         Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.
@@ -565,7 +583,6 @@ cdef class MATree:
         else:
             return self.dfe_helper(self.t.get_node(nid.encode("UTF-8")), reverse)
 
-    @_timer
     def get_leaves(self, nid: str = "") -> list[MATNode]:
         """Create a list of MATNode objects representing each leaf descended from the indicated node. By default, returns all leaves on the tree.
 
@@ -582,7 +599,6 @@ cdef class MATree:
             wrappers.append(nodec)
         return wrappers
 
-    @_timer
     def get_leaves_ids(self, nid: str = "") -> list[str]:
         """Return a list of leaf name strings containing all leaves descended from the indicated node. By default, returns all leaves on the tree.
 
@@ -609,7 +625,6 @@ cdef class MATree:
             pynvec.reverse()
         return pynvec
 
-    @_timer
     def breadth_first_expansion(self, nid: str = "", reverse: bool = False) -> list[MATNode]:
         """Perform a level order (breadth-first) expansion starting from the indicated node. Use reverse to traverse in reverse level order (all leaves, then all leaf parents, back to root) instead.
 
