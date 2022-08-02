@@ -133,7 +133,7 @@ cdef class MATNode:
     """
     cdef bte.Node* n
 
-    def __init__(self, tree: MATree = None, parent: Optional[str] = None, identifier: str = "", mutations: list = [], annotations: list = []):
+    def __init__(self, tree: MATree = None, parent: Optional[str] = None, identifier: str = "", mutations: list = [], annotations: list = [], branch_length: float = 0.0):
         """
         Initalize a MATNode and an associated Node and add it to the tree as a child of the indicated Node.
         Can optionally have mutations loaded as well. By default, creates a MATNode wrapper with no associated Node.
@@ -148,9 +148,13 @@ cdef class MATNode:
             mutations (list[str]): A list of mutations to apply to the Node. Optional.
 
             annotations (list[str]): A list of annotations to apply to the Node. Optional.
+
+            branch_length (float): The length of the branch as a float. Optional; if not set, will be equal to the length of the mutations list.
         """
         if tree != None and identifier != "" and parent != None:
-            tree.create_node(identifier, parent, mutations, annotations)
+            if branch_length == 0:
+                branch_length = len(mutations)
+            tree.create_node(identifier, parent, mutations, annotations, branch_length)
             self.n = tree.t.get_node(identifier.encode("UTF-8"))
 
     cdef from_node(self, bte.Node* n):
@@ -204,6 +208,10 @@ cdef class MATNode:
     def annotations(self):
         return [a.decode("UTF-8") for a in self.n.clade_annotations]
 
+    @property
+    def branch_length(self):
+        return self.n.branch_length
+
     def most_recent_annotation(self):
         """Find the most recent clade annotations for the node in the node's ancestry.
         """      
@@ -246,6 +254,7 @@ cdef class MATNode:
         fstr += "children: " + str([c.id for c in self.children]) + "\n"
         fstr += "mutations: " + str(self.mutations) + "\n"
         fstr += "annotations: " + str(self.annotations) + "\n"
+        fstr += "branch length: " + str(self.branch_length) + "\n"
         return fstr
 
 cdef complement(int8_t input):
@@ -1132,7 +1141,7 @@ cdef class MATree:
                     clades.add(anns[j].decode("UTF-8"))
         return clades
 
-    def create_node(self, identifier: str, parent_id: str, mutations: list[str] = [], annotations = []):
+    def create_node(self, identifier: str, parent_id: str, mutations: list[str] = [], annotations: list[str] = [], branch_length: float = 0.0):
         """Create a new node and place it in the tree without generating a wrapper.
         This does not return a MATNode object, so access to the created node will require a subsequent 
         get_node call or using the MATNode constructor method to add the node to the tree.
@@ -1145,10 +1154,14 @@ cdef class MATree:
             mutations (list[str]): A list of mutations to add to the new node. Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.
 
             annotations (list[str]): A list of annotations to add to the new node. Currently limited to 2 or less.
+
+            branch_length (float): The length of the branch between the new node and its parent. If not specified, the branch length is equal to the number of mutations.
         """
         if len(annotations) > 2:
             raise ValueError("Cannot have more than 2 annotations per node due to internal implementation limitations.")
-        cdef float blen = float(len(mutations))
+        if branch_length == 0.0:
+            branch_length = float(len(mutations))
+        cdef float blen = branch_length
         cdef Node* newnode = self.t.create_node(identifier.encode("UTF-8"),parent_id.encode("UTF-8"),blen)
         cdef bte.Mutation newmut
         for m in mutations:
