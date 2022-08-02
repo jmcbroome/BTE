@@ -13,6 +13,7 @@ import functools
 import time
 from typing import Optional, Union
 import sys
+import math
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -48,6 +49,20 @@ cdef bte.Mutation instantiate_mutation(str mstr):
     newmut.mut_nuc = mn
     newmut.position = loc
     return newmut
+
+cdef float entropy(vector[float] frequencies):
+    """
+    Calculate the entropy of a vector of frequencies. Frequencies must be between 0 and 1.
+    """
+    cdef float ent = 0.0
+    cdef int i = 0
+    while i < frequencies.size():
+        if frequencies[i] > 0.0:
+            if frequencies[i] > 1.0:
+                raise ValueError("Frequencies must be between 0 and 1.")
+            ent += frequencies[i] * math.log(frequencies[i])
+        i = i + 1
+    return -ent
 
 class AAChange:
     """
@@ -1207,3 +1222,46 @@ cdef class MATree:
         for i in range(changes.size()):
             translation_table[changes[i].first.decode("UTF-8")] = _generate_translations(changes[i].second.decode("UTF-8"))
         return translation_table
+
+    def tree_entropy(self, categorical: dict[str,str], from_node: str = "") -> dict[str,float]:
+        """
+        Calculate the absolute and relative entropy of each split in the tree with respect to a categorical tip trait map. 
+        If a node is specified, the entropy map of the subtree rooted at that node is returned.
+        If no node is specified, the entropy map of the entire tree is returned.
+
+        Args:
+            categorical (dict[str,str]): A dictionary of categorical trait values with the sample IDs as keys.
+            from_node (str): The identifier of the node to calculate the entropy from. If not specified, the entropy map of the entire tree is returned.
+        """
+        ##TODO: this implementation relies on python wrapper-level code. It could be further optimized with the use of C++ typed maps and direct access to Node* pointers.
+        node_entropy_map = {}
+        nvcd = {}
+        sample_count_map = {}
+        total_samples = 0
+        nodes = self.depth_first_expansion(from_node)
+        for n in nodes[::-1]:
+            if n.is_leaf():
+                catval = categorical.get(n.id,None)
+                if catval == None:
+                    raise KeyError("Categorical trait value not found for sample ID: " + n.id)
+                nvcd[n.id] = {catval:1}
+                sample_count_map[n.id] = 1
+                total_samples += 1
+            else:
+                freq_map = {}
+                total = 0
+                for c in n.children:
+                    childd = nvcd[c.id]            
+                    for catval, count in childd.items():
+                        total += count
+                        if catval not in freq_map:
+                            freq_map[catval] = count
+                        else:
+                            freq_map[catval] += count
+                nvcd[n.id] = freq_map
+                ev = entropy([v/total for v in freq_map.values()])
+                if ev > 0:
+                    rel_ev = ev - sum([node_entropy_map.get(c.id,(0,0))[0]*sample_count_map[c.id]/total_samples for c in n.children])
+                    node_entropy_map[n.id] = (ev, rel_ev)
+                sample_count_map[n.id] = total
+        return node_entropy_map
