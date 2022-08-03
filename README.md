@@ -1,5 +1,5 @@
 # BIG TREE EXPLORER (BTE)
-<img src="bte_logo.png" width="400" height="400">
+<img src="bte_logo.png" width="500" height="500">
 
 Cython API for the [Mutation Annotated Tree (MAT) Online Phylogenetics Toolkit](https://github.com/yatisht/usher). 
 
