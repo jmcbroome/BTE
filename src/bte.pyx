@@ -14,6 +14,7 @@ import time
 from typing import Optional, Union
 import sys
 import math
+from os.path import exists
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -305,6 +306,8 @@ cdef class MATree:
         self._tree_only = False
         self._empty = False
         if pb_file != None:
+            if not exists(pb_file):
+                raise Exception("Input file not found!")
             if nwk_file != None or vcf_file != None or nwk_string != None:
                 print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring",file=sys.stderr)
             if pb_file[-3:] == ".pb" or pb_file[-6:] == ".pb.gz":
@@ -312,18 +315,26 @@ cdef class MATree:
             else:
                 raise Exception("Invalid file type for pb_file argument. Must be .pb or .pb.gz")
         elif json_file != None:
+            if not exists(json_file):
+                raise Exception("Input json file not found!")
             self.from_json(json_file)
         elif nwk_string != None:
             if vcf_file != None:
+                if not exists(vcf_file):
+                    raise Exception("Input vcf file not found!")
                 print("WARNING: nwk_string is for tree-only loading and does not use vcf input. Consider using nwk_file.",file=sys.stderr)
             self.t = bte.create_tree_from_newick_string(nwk_string.encode("UTF-8"))
             self._tree_only = True
         else:
             if nwk_file != None:
+                if not exists(nwk_file):
+                    raise Exception("Input newick file not found!")
                 if vcf_file == None:
                     self.t = bte.create_tree_from_newick(nwk_file.encode("UTF-8"))
                     self._tree_only = True
                 else:
+                    if not exists(vcf_file):
+                        raise Exception("Input vcf file not found!")
                     self.from_newick_and_vcf(nwk_file,vcf_file)
             elif vcf_file != None:
                 raise Exception("Loading from VCF requires a newick file.")
@@ -588,7 +599,6 @@ cdef class MATree:
             pynvec.reverse()
         return pynvec
 
-    @_timer
     def depth_first_expansion(self, nid: Optional[str] = None, reverse: bool = False) -> list[MATNode]:
         """Perform a preorder (depth-first) expansion of the tree, starting from the indicated node. 
         By default, traverses the whole tree. Set reverse to true to traverse in postorder (reverse depth-first) instead.
@@ -911,7 +921,7 @@ cdef class MATree:
         cdef cset[bte.Mutation] accm = self.accumulate_mutations(nid.encode("UTF-8"))
         cdef cset[bte.Mutation].iterator accm_it = accm.begin()
         while accm_it != accm.end():
-            pyset.add(dereference(accm_it).get_string())
+            pyset.add(dereference(accm_it).get_string().decode('UTF-8'))
             postincrement(accm_it)
         return pyset
 
@@ -975,7 +985,6 @@ cdef class MATree:
         return clade_counts
 
     @_check_newick_only    
-    @_timer
     def count_haplotypes(self) -> dict[tuple,int]:
         """Count unique haplotypes from the tree.
 
