@@ -231,18 +231,21 @@ cdef class MATNode:
             ancestor = ancestor.parent
         return annotations
 
-    def update_mutations(self, mutation_list: list[str]):
+    def update_mutations(self, mutation_list: list[str], update_branch_length: bool = True):
         """Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
         Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.
 
         Args:
             mutation_list (list[str]): List of mutations to store.
+            update_branch_length (bool): If true, will update the branch length to the length of the new mutation list.
         """        
         self.n.mutations.clear()
         cdef bte.Mutation newmut
         for mstr in mutation_list:
             newmut = instantiate_mutation(mstr)
             self.n.mutations.push_back(newmut)
+        if update_branch_length:
+            self.n.branch_length = len(mutation_list)
 
     def __repr__(self):
         fstr = ""
@@ -375,7 +378,7 @@ cdef class MATree:
                 return func(self, *args,**kwargs)
         return wrap
 
-    def apply_mutations(self, mmap: dict[str,list[str]]) -> None:
+    def apply_mutations(self, mmap: dict[str,list[str]], update_branch_length: bool = True) -> None:
         """Pass a set of node:mutation mappings to place into the tree. Current mutations will be replaced.
 
         Args:
@@ -383,7 +386,7 @@ cdef class MATree:
         """
         for nid, nms in mmap.items():
             node = self.get_node(nid)
-            node.update_mutations(nms)
+            node.update_mutations(nms, update_branch_length)
         #the tree is now annotated with mutations and mutation-based functions can be attempted.
         self._tree_only = False
 

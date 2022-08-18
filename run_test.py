@@ -84,3 +84,10 @@ class TestMat(unittest.TestCase):
         self.assertTrue(t.get_node("node_Y").parent.id == "node_X")
         t.remove_node("node_X")
         self.assertTrue("node_X" not in [c.id for c in t.root.children])
+
+    def test_branch_length(self):
+        t.create_node("node_Z",t.root.id, branch_length = 0.5)
+        self.assertTrue(t.get_node("node_Z").branch_length == 0.5)
+        t.apply_mutations({'node_Z':['A1234G']},True)
+        self.assertTrue(t.get_node("node_Z").branch_length == 1)
+        t.remove_node("node_Z")
