@@ -237,7 +237,7 @@ cdef class MATNode:
 
         Args:
             mutation_list (list[str]): List of mutations to store.
-            update_branch_length (bool): If true, will update the branch length to the length of the new mutation list.
+            update_branch_length (bool): Update the branch length attribute to the new count of mutations. Default is True.
         """        
         self.n.mutations.clear()
         cdef bte.Mutation newmut
@@ -383,6 +383,7 @@ cdef class MATree:
 
         Args:
             mmap (dict[str,list[str]]): A dictionary of node:mutation list mappings (e.g. {"node_id":["chro:reflocalt","chro:reflocalt"]}, {"node_1":["chro1:A123G","chro3:T315G"]}
+            update_branch_length (bool): Update the branch length to match the new count of mutations on each node. Defaults to True.
         """
         for nid, nms in mmap.items():
             node = self.get_node(nid)

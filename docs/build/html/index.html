@@ -91,7 +91,7 @@ A string representation of an amino acid change, such as &quot;S:N501Y&quot;, ca
 
 <dl class="py class">
 <dt class="sig sig-object py" id="bte.MATNode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bte.</span></span><span class="sig-name descname"><span class="pre">MATNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MATree</span> <span class="pre">tree:</span> <span class="pre">MATree</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">identifier:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">u''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">mutations:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">annotations:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bte.</span></span><span class="sig-name descname"><span class="pre">MATNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MATree</span> <span class="pre">tree:</span> <span class="pre">MATree</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">identifier:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">u''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">mutations:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">annotations:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">double</span> <span class="pre">branch_length:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper around the MAT node class. Has an identifier, mutations, parent, and child attributes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATNode.is_leaf">
@@ -100,12 +100,19 @@ A string representation of an amino acid change, such as &quot;S:N501Y&quot;, ca
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="bte.MATNode.most_recent_annotation">
+<span class="sig-name descname"><span class="pre">most_recent_annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode.most_recent_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the most recent clade annotations for the node in the node's ancestry.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bte.MATNode.update_mutations">
-<span class="sig-name descname"><span class="pre">update_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode.update_mutations" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self,</span> <span class="pre">mutation_list:</span> <span class="pre">list[str],</span> <span class="pre">bool</span> <span class="pre">update_branch_length:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode.update_mutations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
 Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>mutation_list (list[str]): List of mutations to store.</p>
+<dt>Args:</dt><dd><p>mutation_list (list[str]): List of mutations to store.
+update_branch_length (bool): Update the branch length attribute to the new count of mutations. Default is True.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -131,10 +138,11 @@ are from a specific clade or lineage.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.apply_mutations">
-<span class="sig-name descname"><span class="pre">apply_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.apply_mutations" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self,</span> <span class="pre">mmap:</span> <span class="pre">dict[str,</span> <span class="pre">list[str]],</span> <span class="pre">bool</span> <span class="pre">update_branch_length:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.apply_mutations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pass a set of node:mutation mappings to place into the tree. Current mutations will be replaced.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>mmap (dict[str,list[str]]): A dictionary of node:mutation list mappings (e.g. {&quot;node_id&quot;:[&quot;chro:reflocalt&quot;,&quot;chro:reflocalt&quot;]}, {&quot;node_1&quot;:[&quot;chro1:A123G&quot;,&quot;chro3:T315G&quot;]}</p>
+<dt>Args:</dt><dd><p>mmap (dict[str,list[str]]): A dictionary of node:mutation list mappings (e.g. {&quot;node_id&quot;:[&quot;chro:reflocalt&quot;,&quot;chro:reflocalt&quot;]}, {&quot;node_1&quot;:[&quot;chro1:A123G&quot;,&quot;chro3:T315G&quot;]}
+update_branch_length (bool): Update the branch length to match the new count of mutations on each node. Defaults to True.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -223,7 +231,7 @@ descended from that node. By default, this counts across the entire tree.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.create_node">
-<span class="sig-name descname"><span class="pre">create_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">identifier:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">parent_id:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutations:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations=[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATree.create_node" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">identifier:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">parent_id:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutations:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">double</span> <span class="pre">branch_length:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATree.create_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new node and place it in the tree without generating a wrapper.
 This does not return a MATNode object, so access to the created node will require a subsequent 
 get_node call or using the MATNode constructor method to add the node to the tree.</p>
@@ -232,6 +240,7 @@ get_node call or using the MATNode constructor method to add the node to the tre
 <p>parent_id (str): The identifier of the parent node.</p>
 <p>mutations (list[str]): A list of mutations to add to the new node. Mutation strings should be formatted as chro:reflocalt e.g. chr1:A234G. If chromosome is left off, assumes SARS-CoV-2 chromosome.</p>
 <p>annotations (list[str]): A list of annotations to add to the new node. Currently limited to 2 or less.</p>
+<p>branch_length (float): The length of the branch between the new node and its parent. If not specified, the branch length is equal to the number of mutations.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -589,6 +598,19 @@ The translation is representative of the tree at the time of this function being
 <dl>
 <dt>Args:</dt><dd><p>gtf_file (str): The path to the GTF file containing gene information.</p>
 <p>fasta_file (str): The path to the FASTA file containing the reference genome.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bte.MATree.tree_entropy">
+<span class="sig-name descname"><span class="pre">tree_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self,</span> <span class="pre">categorical:</span> <span class="pre">dict[str,</span> <span class="pre">str],</span> <span class="pre">unicode</span> <span class="pre">from_node:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">u''</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.tree_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the absolute and relative entropy of each split in the tree with respect to a categorical tip trait map. 
+If a node is specified, the entropy map of the subtree rooted at that node is returned.
+If no node is specified, the entropy map of the entire tree is returned.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>categorical (dict[str,str]): A dictionary of categorical trait values with the sample IDs as keys.
+from_node (str): The identifier of the node to calculate the entropy from. If not specified, the entropy map of the entire tree is returned.</p>
 </dd>
 </dl>
 </dd></dl>
