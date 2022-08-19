@@ -105,7 +105,7 @@ python3 -m unittest run_test.py
 
 ### Installation from `conda` Channel
 
-BTE, as a python extension, is version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, you may have a broken environment. The fastest solution to either issue is to build the BTE environment with a supported version of Python and install BTE there.
+BTE, as a python extension, is version specific. If you're unable to "import bte" after successful installation via conda, ensure you're using the version of Python associated with your conda installer (python --version). If you encounter an error related to missing ".so" files, setup.py build_ext raises exceptions with Protoc versions, or conda is unable to resolve environment conflicts, you may have a broken environment. The fastest solution to any of these related issues is to build a fresh environment with a supported version of Python and install BTE there.
 
 ```
 conda create --name bte -c conda-forge -c bioconda bte python=3.8
