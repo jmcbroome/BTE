@@ -106,7 +106,7 @@ class AAChange:
         fstr += "gene: " + self.gene + "\n"
         fstr += "aa: " + self.aa + "\n"
         fstr += "nuc: " + self.nuc + "\n"
-        fstr += "codon: " + self.codons + "\n"
+        fstr += "codon: " + self.original_codon + ">" + self.alternative_codon + "\n"
         return fstr
 
 def _generate_translations(transtr):
