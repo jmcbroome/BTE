@@ -165,7 +165,7 @@ cdef class MATNode:
         to the C++ class attributes.
         """
         if n == cython.NULL:
-            raise ValueError("Parent node is null- are you trying to take the parent of the root?")
+            raise ValueError("Target node is null- check that your node exists and that you're not taking the parent of the root node.")
         self.n = n
         return self
 
