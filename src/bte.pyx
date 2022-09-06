@@ -213,8 +213,11 @@ cdef class MATNode:
     def branch_length(self):
         return self.n.branch_length
 
-    def most_recent_annotation(self):
+    def most_recent_annotation(self) -> list[str]:
         """Find the most recent clade annotations for the node in the node's ancestry.
+
+        Returns:
+            A list of annotation strings.
         """      
         cdef bte.Node* ancestor = self.n
         cdef size_t anncount = self.n.clade_annotations.size()
