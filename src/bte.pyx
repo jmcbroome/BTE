@@ -581,8 +581,7 @@ cdef class MATree:
             MATNode: MATNode class object representing the indicated node.s
         """
         nc = MATNode()
-        cdef Node* nobj = self.t.get_node(name.encode("UTF-8"))
-        nc.from_node(nobj)
+        nc.from_node(self.t.get_node(name.encode("UTF-8")))
         return nc
 
     @property
