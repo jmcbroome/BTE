@@ -560,7 +560,13 @@ cdef class MATree:
         elif type(metafiles) == list and len(metafiles) > 0:
             for mf in metafiles:
                 catmeta.push_back(bte.read_metafile(mf.encode("UTF-8"),sample_set))
-        bte.write_json_from_mat(&self.t,jsonf.encode("UTF-8"),&catmeta,title.encode("UTF-8"))
+        cdef bte.Tree subtree
+        with nogil:
+            subtree = bte.filter_master(self.t, sample_names, False, True)
+        if subtree.get_num_leaves(subtree.root) == 0:
+            print("ERROR: Unable to find samples to extract json! Check sample input")
+            exit(1)
+        bte.write_json_from_mat(&subtree,jsonf.encode("UTF-8"),&catmeta,title.encode("UTF-8"))
 
     def get_parsimony_score(self) -> int:
         """
