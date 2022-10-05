@@ -581,7 +581,8 @@ cdef class MATree:
             MATNode: MATNode class object representing the indicated node.s
         """
         nc = MATNode()
-        nc.from_node(self.t.get_node(name.encode("UTF-8")))
+        cdef Node* nobj = self.t.get_node(name.encode("UTF-8"))
+        nc.from_node(nobj)
         return nc
 
     @property
@@ -1246,6 +1247,12 @@ cdef class MATree:
 
             fasta_file (str): The path to the FASTA file containing the reference genome.
         """
+        if not exists(gtf_file):
+            print("ERROR: GTF file {} not found!".format(gtf_file))
+            exit(1)
+        if not exists(fasta_file):
+            print("ERROR: FASTA file {} not found!".format(fasta_file))
+            exit(1)
         translation_table = {}
         cdef vector[pair[string,string]] changes = bte.do_translation(&self.t,gtf_file.encode("UTF-8"),fasta_file.encode("UTF-8"))
         for i in range(changes.size()):
