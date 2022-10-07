@@ -565,7 +565,7 @@ cdef class MATree:
             subtree = bte.filter_master(self.t, sample_names, False, True)
         if subtree.get_num_leaves(subtree.root) == 0:
             print("ERROR: Unable to find samples to extract json! Check sample input")
-            exit(1)
+            sys.exit(1)
         bte.write_json_from_mat(&subtree,jsonf.encode("UTF-8"),&catmeta,title.encode("UTF-8"))
 
     def get_parsimony_score(self) -> int:
@@ -1254,10 +1254,10 @@ cdef class MATree:
         """
         if not exists(gtf_file):
             print("ERROR: GTF file {} not found!".format(gtf_file))
-            exit(1)
+            sys.exit(1)
         if not exists(fasta_file):
             print("ERROR: FASTA file {} not found!".format(fasta_file))
-            exit(1)
+            sys.exit(1)
         translation_table = {}
         cdef vector[pair[string,string]] changes = bte.do_translation(&self.t,gtf_file.encode("UTF-8"),fasta_file.encode("UTF-8"))
         for i in range(changes.size()):
