@@ -315,11 +315,11 @@ cdef class MATree:
             if not exists(pb_file):
                 raise Exception("Input file not found!")
             if nwk_file != None or vcf_file != None or nwk_string != None:
-                print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pbf. Ignoring",file=sys.stderr)
+                print("WARNING: nwk_file, nwk_string and vcf_file arguments are exclusive with pb_file. Ignoring",file=sys.stderr)
             if pb_file[-3:] == ".pb" or pb_file[-6:] == ".pb.gz":
                 self.from_pb(pb_file,uncondense)
             else:
-                raise Exception("Invalid file type for pb_file argument. Must be .pb or .pb.gz")
+                raise Exception("Invalid file extension for pb_file argument. Must be .pb or .pb.gz")
         elif json_file != None:
             if not exists(json_file):
                 raise Exception("Input json file not found!")
@@ -592,7 +592,7 @@ cdef class MATree:
 
     @property
     def root(self) -> MATNode:
-        """Return a MATNode wrapper representing the root node of the tree.
+        """Retrieve the root of the tree.
 
         Returns:
             MATNode: MATNode wrapper representing the root node of the tree.
