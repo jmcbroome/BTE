@@ -884,6 +884,7 @@ cdef class MATree:
     cdef cset[bte.Mutation] accumulate_mutations(self, string sample):
         cdef vector[bte.Node*] ancestors = self.t.rsearch(sample, True)
         cdef cset[bte.Mutation] allm
+        cdef cset[bte.Mutation].iterator allm_iter
         cdef size_t i
         cdef bte.Node* cnode
         cdef bte.Mutation m, om
@@ -894,15 +895,21 @@ cdef class MATree:
             cnode = ancestors[ancs-i-1]
             for j in range(cnode.mutations.size()):
                 m = cnode.mutations[j]
-                #check that the opposite of this mutation is not in the set
-                #if it is, instead delete it and skip this entry (as they negate each other with respect to the sample's final genome)
-                om = m.copy()
-                om.mut_nuc = m.par_nuc
-                om.par_nuc = m.mut_nuc
-                oml = allm.find(om)
-                if oml != allm.end():
-                    allm.erase(oml)
-                else:
+                fresh = True
+                allm_iter = allm.begin()
+                while allm_iter != allm.end():
+                    om = dereference(allm_iter)
+                    if (m.chrom == om.chrom) and (m.position == om.position):
+                        fresh = False
+                        #instead of inserting this mutation anew, update the old one.
+                        #if they're opposite, they negate to prevent a mutation from something to itself.
+                        if m.mut_nuc == om.par_nuc:
+                            allm.erase(allm_iter)
+                        else:
+                            om.mut_nuc = m.mut_nuc
+                        break
+                    postincrement(allm_iter)
+                if fresh:
                     allm.insert(m)
         return allm
 
