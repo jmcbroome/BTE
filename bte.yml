@@ -7,3 +7,4 @@ dependencies:
   - cython
   - protobuf=3.19
   - tbb-devel=2019.0
+  - cxx-compiler
