@@ -1313,3 +1313,52 @@ cdef class MATree:
                     node_entropy_map[n.id] = (ev, rel_ev)
                 sample_count_map[n.id] = total
         return node_entropy_map
+
+    cdef do_placement(self, vector[Mutation*] muts, int ignore_before, int ignore_after):
+        cdef mapper2_input mapin
+
+        cdef vector[Node*] nodes = t.breadth_first_expansion()
+        cdef Node* n
+        cdef vector[Mutation] muts_to_keep
+        for i in range(nodes.size()):
+            muts_to_keep.clear()
+            n = nodes[i]
+            for mi in range(n.mutations.size()):
+                if n.mutations[mi].position >= ignore_before or n.mutations[mi].position < ignore_after:
+                    muts_to_keep.push_back(n.mutations[mi])
+            n.mutations = muts_to_keep
+
+
+            mapin.missing_sample_mutations = mutobjs
+            mapper2_body(mapper2_input, True, False)
+
+    @_timer
+    def place_mutations(self, muts: list[str], start: int = 1, stop: int = 29903) -> tuple[int, list[str]]:
+        """
+        Takes a set of mutation strings and identifies the set of equally maximally parsimonious placements on the tree for that set of mutations.
+
+        Args:
+            muts (list[str]): set of mutations as strings (e.g. A103G)
+            start (int): ignore mutations occurring before this location in the genome for placement of the input mutation set (for if you're mapping using a specific gene, etc)
+            stop (int): ignore mutations occurring at or after this location in the genome for plcaement of the input mutation set.
+        Returns:
+            placements (tuple[int, list[str]]): a tuple containing the parsimony score and the list of node_ids.
+        """
+        cdef vector[Mutation*] mutobjs
+        cdef Mutation cmut
+        #please don't pass a list with more than one mutation in the same place...
+        loclook = {}
+        for m in muts:
+            loc = int(m[1:-1])
+            if loc in loclook:
+                print("ERROR: can't pass multiple mutations in the same location for placement!",file=sys.stderr)
+                return None
+            loclook[loc] = m
+        #fill in all other indices with ambiguous bases so they don't interfere with placement.
+        for i in range(1, 29903):
+            m = loclook.get(i, "N"+str(i)+"N")
+            cmut = instantiate_mutation(m)
+            mutobjs.push_back(cmut*)
+
+        do_placement(mutobs, start, stop)
+

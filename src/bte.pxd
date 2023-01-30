@@ -98,8 +98,28 @@ cdef extern from "usher/src/usher_graph.hpp" nogil:
         long Stop()
     struct Missing_Sample:
         pass
+    struct mapper2_input:
+        string missing_sample
+        Tree* T
+        Node* node
+        vector[Mutation]* missing_sample_mutations
+        int* best_set_difference
+        int* set_difference
+        size_t* best_node_num_leaves
+        size_t j
+        size_t* best_j
+        size_t distance
+        size_t* best_distance
+        size_t* num_best
+        Node** best_node
+        vector[bool]* node_has_unique
+        vector[size_t]* best_j_vec
+        bool* has_unique
+        vector[Mutation]* excess_mutations
+        vector[Mutation]* imputed_mutations
+
 cdef extern from "usher/src/usher_mapper.cpp" nogil:
-    pass
+    void mapper2_body(mapper2_input, bool compute_parsimony_scores, bool compute_vecs) except + 
 cdef extern from "parsimony.pb.cc" nogil:
     pass
 cdef extern from "usher/src/matUtils/common.hpp" nogil:
