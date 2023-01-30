@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       #install the environment and all dependencies then build the extension
@@ -26,7 +26,7 @@ jobs:
           python3 setup.py build_ext --inplace
           python3 -m unittest run_test.py
   build-mac:
-    runs-on: macOS-latest
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v3
       #install the environment and all dependencies then build the extension
