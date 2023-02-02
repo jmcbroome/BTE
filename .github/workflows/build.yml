@@ -20,9 +20,9 @@ jobs:
           git submodule update --init
       - name: install env
         run: |
-          $CONDA/bin/conda env update --file bte.yml --name base
+          $CONDA/bin/conda env create --file bte.yml --no-default-packages
           eval "$(conda shell.bash hook)"
-          conda activate base
+          conda activate bte
           python3 setup.py build_ext --inplace
           python3 -m unittest run_test.py
   build-mac:
@@ -36,8 +36,8 @@ jobs:
           git submodule update --init
       - name: install env
         run: |
-          $CONDA/bin/conda env update --file bte.yml --name base
+          $CONDA/bin/conda env create --file bte.yml --no-default-packages
           eval "$(conda shell.bash hook)"
-          conda activate base
+          conda activate bte
           python3 setup.py build_ext --inplace
           python3 -m unittest run_test.py
