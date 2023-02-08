@@ -40,12 +40,12 @@ cdef bte.Mutation instantiate_mutation(str mstr):
         chro = "NC_045512v2"
         info = mstr
     assert len(mstr) > 0
-    loc = int(mstr[1:-1])
+    loc = int(info[1:-1])
     newmut.chrom = chro.encode("UTF-8")
-    pns = ord(mstr[0])
+    pns = ord(info[0])
     pn = bte.get_nuc_id(pns)
     newmut.par_nuc = pn
-    mns = ord(mstr[-1])
+    mns = ord(info[-1])
     mn = bte.get_nuc_id(mns)
     newmut.mut_nuc = mn
     newmut.position = loc
@@ -204,6 +204,24 @@ cdef class MATNode:
     @property
     def mutations(self):
         return [m.get_string().decode("UTF-8") for m in self.n.mutations]
+
+    def get_mutation_information(self) -> list[dict[str,str]]:
+        """
+        Print full attribute information for each mutation associated with this node, including chromosome, location, parent, reference, and alternative nucleotides.
+
+        Returns:
+            list[dist[str,str]]: List of dictionaries containing keyed attribute information.
+        """
+        outv = []
+        for m in self.n.mutations:
+            md = {}
+            md['chrom'] = m.chrom.decode("UTF-8")
+            md['position'] = m.position
+            md['ref_nuc'] = chr(bte.get_nuc(m.ref_nuc))
+            md['par_nuc'] = chr(bte.get_nuc(m.par_nuc))
+            md['mut_nuc'] = chr(bte.get_nuc(m.mut_nuc))
+            outv.append(md)
+        return outv
 
     @property
     def annotations(self):
