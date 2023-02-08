@@ -15,7 +15,6 @@ from typing import Optional, Union
 import sys
 import math
 from os.path import exists
-import os
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
