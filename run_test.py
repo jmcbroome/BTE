@@ -1,6 +1,7 @@
 import bte
 import unittest
 import os
+import sys
 #load our test case as a universal object, outside of the test class.
 t = bte.MATree()
 
@@ -90,4 +91,15 @@ class TestMat(unittest.TestCase):
         self.assertTrue(t.get_node("node_Z").branch_length == 0.5)
         t.apply_mutations({'node_Z':['A1234G']},True)
         self.assertTrue(t.get_node("node_Z").branch_length == 1)
+        minfo = t.get_node("node_Z").get_mutation_information()[0]
+        self.assertTrue(minfo['position'] == 1234)
+        self.assertTrue(minfo['par_nuc'] == 'A')
+        self.assertTrue(minfo['mut_nuc'] == 'G')
         t.remove_node("node_Z")
+
+    def test_annotation(self):
+        to_apply = {t.root.children[0].id:['ann1','ann2']}
+        t.apply_node_annotations(to_apply)
+        dump = t.dump_node_annotations()
+        self.assertTrue(to_apply[t.root.children[0].id] == dump[t.root.children[0].id])
+
