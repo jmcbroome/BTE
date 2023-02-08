@@ -15,6 +15,7 @@ from typing import Optional, Union
 import sys
 import math
 from os.path import exists
+import os
 
 def _timer(func, *args, **kwargs):
     @functools.wraps(func)
@@ -457,10 +458,10 @@ cdef class MATree:
         self._tree_only = False
 
     def save_pb(self, file: str, condense: bool = True) -> None:
-        """Save the tree to a protobuf file.
+        """Save the tree to a protobuf file. If the filename ends in '.pb.gz', it will be gzipped automatically.
 
         Args:
-            file (str): Name for the .pb file.
+            file (str): Name for the .pb/.pb.gz file.
 
             condense (bool, optional): Condense the tree before saving. Defaults to True.
         """        
@@ -523,7 +524,7 @@ cdef class MATree:
         """
         cdef vector[string] sample_names
         if len(samples) == 0:
-            sample_names = self.t.get_leaves_ids("".encode("UTF-8"))
+            sample_names = self.t.get_leaves_ids(b"")
         else:
             for s in samples:
                 if type(s) == str:
@@ -1236,26 +1237,25 @@ cdef class MATree:
         """
         self.t.remove_node(to_remove.encode("UTF-8"), True)
 
-    def apply_annotations(self, annotations: dict[str,list[str]]) -> None:
+    def apply_node_annotations(self, annotations: dict[str,list[str]]) -> None:
         """Apply annotations to the tree. Replaces any annotations on nodes affected.
 
         Args:
-            annotations (dict[str,list[str]]): A dictionary of annotations to apply to the tree. No more than two annotations per node.
+            annotations (dict[str,list[str]]): A dictionary of annotations to apply to the tree, keyed on node_id with a list of annotation strings as the value.
         """
         cdef Node* node
         for nid, annv in annotations.items():
-            if len(annv) > 2:
-                raise ValueError("Cannot have more than 2 annotations per node due to internal implementation limitations.")
             node = self.t.get_node(nid.encode("UTF-8"))
             node.clade_annotations.clear()
             for an in annv:
                 node.clade_annotations.push_back(an.encode("UTF-8"))
         
-    def dump_annotations(self) -> dict[str,list[str]]:
-        """Return a dictionary of all annotations on the tree with the internal nodes they are currently defined by.
+    def get_annotations(self) -> dict[str,str]:
+        """
+        Return a dictionary keyed on all annotations with values of the internal node they are defined by. 
 
         Returns:
-            dict[str,list[str]]: A dictionary of annotations with the root node they are attached to.
+            dict[str,str]: A dictionary of annotations with the root node they are associated with.
         """
         claderoots = {}
         cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
@@ -1265,6 +1265,27 @@ cdef class MATree:
             for j in range(anns.size()):
                 if anns[j].size() > 0:
                     claderoots[anns[j].decode("UTF-8")] = nodes[i].identifier.decode("UTF-8")
+        return claderoots
+
+    def dump_node_annotations(self) -> dict[str,list[str]]:
+        """Return a dictionary of internal node ids with corresponding annotation root labels. 
+        Formatted for compatibility with apply_node_annotations().
+        If a node is not included, it does not have any associated annotation roots.
+
+        Returns:
+            dict[str,list[str]]: A dictionary of nodes with the annotation roots they are associated with. 
+        """
+        claderoots = {}
+        cdef vector[Node*] nodes = self.t.depth_first_expansion(self.t.root)
+        cdef vector[string] anns
+        for i in range(nodes.size()):
+            anns = nodes[i].clade_annotations
+            for j in range(anns.size()):
+                if anns[j].size() > 0:
+                    nid = nodes[i].identifier.decode("UTF-8")
+                    if nid not in claderoots:
+                        claderoots[nid] = []
+                    claderoots[nid].append(anns[j].decode("UTF-8"))
         return claderoots
 
     def translate(self, gtf_file: str, fasta_file: str) -> dict[str,list[AAChange]]:
