@@ -1,6 +1,6 @@
-FROM continuumio/conda-ci-linux-64-python3.8
+FROM continuumio/miniconda3:latest
 USER root
-WORKDIR /HOME
+WORKDIR /home
 RUN git clone --recurse-submodules https://github.com/jmcbroome/BTE.git
 WORKDIR BTE
 RUN conda env create -f bte.yml
