@@ -28,10 +28,10 @@ This package is for you!
 
 ## Quickstart
 
-If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package via the bioconda channel.
+If you're on osx64 (MacOS) or linux64 (most Linux distributions) and have conda installed, you can install our package via the bioconda channel. Some dependencies are available through the conda-forge channel. 
 
 ```
-conda install -c bioconda bte
+conda install -c conda-forge -c bioconda bte
 ```
 
 Download the latest public SARS-CoV-2 tree:
@@ -50,6 +50,18 @@ tree = bte.MATree("public-latest.all.masked.pb.gz")
 ### A Note on Versions and Architectures
 
 We provide conda builds for Linux and MacOS with Python versions >=3.8. If you're on Windows 10+, you can install BTE on the [Linux subsystem](https://docs.microsoft.com/en-us/windows/wsl/about) and perform analyses and run notebooks from the subsystem. If you're on an earlier version of Python and unable to update, you may still be able to build a local extension using the instructions below.
+
+## Install Through Docker
+
+You can install through the dockerhub image:
+
+TBD
+
+Or locally:
+```
+docker build -t bte .
+docker run -t -i --platform=linux/amd64 bte:latest
+```
 
 ## Build From Source Instructions
 
@@ -117,4 +129,14 @@ If you're having trouble compiling a local extension (using setup.py), you need 
 
 ```
 conda install -c conda-forge -c anaconda cxx-compiler make
+```
+
+## tbb-devel not available
+If tbb-devel=2019.0 is not available, you can try compiling it from source.
+```
+mkdir build
+cd build
+wget https://github.com/oneapi-src/oneTBB/archive/2019_U9.tar.gz
+tar -xvzf 2019_U9.tar.gz
+cmake  -DTBB_DIR=${PWD}/oneTBB-2019_U9  -DCMAKE_PREFIX_PATH=${PWD}/oneTBB-2019_U9/cmake ..
 ```
