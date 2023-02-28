@@ -53,13 +53,18 @@ We provide conda builds for Linux and MacOS with Python versions >=3.8. If you'r
 
 ## Install Through Docker
 
-You can install through the dockerhub image:
+You can install through DockerHub:
 
-TBD
+```
+docker pull jmcbroome/bte:latest
+docker run -t -i bte:latest
+```
 
 Or locally:
 ```
-docker build -t bte .
+git clone --recurse-submodules https://github.com/jmcbroome/BTE.git
+cd bte
+docker build -t bte --no-cache --platform amd64 .
 docker run -t -i --platform=linux/amd64 bte:latest
 ```
 
@@ -132,6 +137,7 @@ conda install -c conda-forge -c anaconda cxx-compiler make
 ```
 
 ## tbb-devel not available
+
 If tbb-devel=2019.0 is not available, you can try compiling it from source.
 ```
 mkdir build
