@@ -120,6 +120,16 @@ A string representation of an amino acid change, such as &quot;S:N501Y&quot;, ca
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="bte.MATNode.set_branch_length">
+<span class="sig-name descname"><span class="pre">set_branch_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">double</span> <span class="pre">blen:</span> <span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode.set_branch_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the branch length for this node to the input float value.</p>
+<dl class="simple">
+<dt>args:</dt><dd><p>blen (float): Set the branch length to this value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bte.MATNode.update_mutations">
 <span class="sig-name descname"><span class="pre">update_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self,</span> <span class="pre">mutation_list:</span> <span class="pre">list[str],</span> <span class="pre">bool</span> <span class="pre">update_branch_length:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATNode.update_mutations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a list of mutations as strings and replace any currently stored mutations on this branch with the new set.
@@ -140,6 +150,18 @@ update_branch_length (bool): Update the branch length attribute to the new count
 numerous functions for tree traversal including breadth-first, depth-first, and traversal from leaf to roots. Also includes
 numerous functions for subtree selection by choosing leaves that match regex patterns, contain specific mutations, or 
 are from a specific clade or lineage.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bte.MATree.LCA">
+<span class="sig-name descname"><span class="pre">LCA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">node_ids:</span> <span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#bte.MATree.LCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the last common ancestor of the input node IDs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>node_ids list[str]: A set of node_ids in string format. Must have a length of at least 2.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The node_id of the last common ancestor.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.apply_mutations">
 <span class="sig-name descname"><span class="pre">apply_mutations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self,</span> <span class="pre">mmap:</span> <span class="pre">dict[str,</span> <span class="pre">list[str]],</span> <span class="pre">bool</span> <span class="pre">update_branch_length:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bte.MATree.apply_mutations" title="Permalink to this definition">¶</a></dt>
@@ -432,6 +454,22 @@ If a node is not included, it does not have any associated annotation roots.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="bte.MATree.get_newick">
+<span class="sig-name descname"><span class="pre">get_newick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subroot:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_internal:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">retain_original_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">uncondense_leaves:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#bte.MATree.get_newick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a newick string from the tree.</p>
+<dl>
+<dt>Args:</dt><dd><p>subroot (Optional[str], optional): Return a newick representing the subtree descended from this node. Defaults to the root.</p>
+<p>print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.</p>
+<p>print_branch_len (bool, optional): Include branch lengths in the newick output. Defaults to True.</p>
+<p>retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.</p>
+<p>uncondense_leaves (bool, optional): Uncondense nodes before returning the newick. Defaults to True.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: A newick string representation of the tree.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.get_node">
 <span class="sig-name descname"><span class="pre">get_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">name:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#bte.MATNode" title="bte.MATNode"><span class="pre">MATNode</span></a></span></span><a class="headerlink" href="#bte.MATree.get_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a MATNode class object representing the indicated node.</p>
@@ -621,9 +659,9 @@ It takes as input a dictionary mapping leaf names to character states and return
 <span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">gtf_file:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">fasta_file:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#bte.AAChange" title="bte.AAChange"><span class="pre">AAChange</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bte.MATree.translate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate amino acid changes across the tree and return the results as a dictionary of node IDs and class objects representing amino acid changes as returned from matUtils translate. 
 The translation is representative of the tree at the time of this function being called only.</p>
-<dl>
-<dt>Args:</dt><dd><p>gtf_file (str): The path to the GTF file containing gene information.</p>
-<p>fasta_file (str): The path to the FASTA file containing the reference genome.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>gtf_file (str): The path to the GTF file containing gene information. 
+fasta_file (str): The path to the FASTA file containing the reference genome.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -657,16 +695,15 @@ You can optionally pass a tsv or csv file or a list of tsv and csv files contain
 
 <dl class="py method">
 <dt class="sig sig-object py" id="bte.MATree.write_newick">
-<span class="sig-name descname"><span class="pre">write_newick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subroot:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_internal:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">retain_original_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">uncondense_leaves:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#bte.MATree.write_newick" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a newick string from the tree.</p>
+<span class="sig-name descname"><span class="pre">write_newick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode</span> <span class="pre">file:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subroot:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_internal:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">print_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">retain_original_branch_len:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bool</span> <span class="pre">uncondense_leaves:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#bte.MATree.write_newick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a newick string representing the tree/subtree to the target file.</p>
 <dl>
-<dt>Args:</dt><dd><p>subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.</p>
+<dt>Args:</dt><dd><p>file (str): Name of the file to write the newick to.</p>
+<p>subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.</p>
 <p>print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.</p>
 <p>print_branch_len (bool, optional): Print branch lengths. Defaults to True.</p>
 <p>retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.</p>
 <p>uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.</p>
-</dd>
-<dt>Returns:</dt><dd><p>str: A newick string representation of the tree.</p>
 </dd>
 </dl>
 </dd></dl>
