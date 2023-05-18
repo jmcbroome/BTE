@@ -502,19 +502,19 @@ cdef class MATree:
         self.t = bte.create_tree_from_newick_string(nwk.encode("UTF-8"))
         self._tree_only = True
 
-    def write_newick(self, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True) -> str:
-        """Write a newick string from the tree.
+    def get_newick(self, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True) -> str:
+        """Extract a newick string from the tree.
 
         Args:
-            subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.
+            subroot (Optional[str], optional): Return a newick representing the subtree descended from this node. Defaults to the root.
 
             print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.
 
-            print_branch_len (bool, optional): Print branch lengths. Defaults to True.
+            print_branch_len (bool, optional): Include branch lengths in the newick output. Defaults to True.
 
             retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.
 
-            uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.
+            uncondense_leaves (bool, optional): Uncondense nodes before returning the newick. Defaults to True.
 
         Returns:
             str: A newick string representation of the tree.
@@ -527,6 +527,25 @@ cdef class MATree:
             se = self.t.get_node(subroot.encode("UTF-8"))
         bte.write_newick_string(ss,self.t,sr,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
         return ss.to_string().decode("UTF-8")
+
+    def write_newick(self, file: str, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True):
+        """Print a newick string representing the tree/subtree to the target file.
+
+        Args:
+            file (str): Name of the file to write the newick to.
+
+            subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.
+
+            print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.
+
+            print_branch_len (bool, optional): Print branch lengths. Defaults to True.
+
+            retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.
+
+            uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.
+        """
+        with open(file,'w+') as of:
+            of.write(tree.get_newick(subroot, print_internal, print_branch_len, retain_original_branch_len, uncondense_leaves))
 
     cpdef vector[string] _read_samples(self,samples):
         """Helper function which converts a Python list of bytes or string samples to a usable C++ string vector.
