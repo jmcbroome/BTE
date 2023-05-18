@@ -1396,7 +1396,12 @@ cdef class MATree:
         possible_lcas = set(possible_lcas_order)
         for nid in node_ids[1:]:
             new_ancestors = set([anc.id for anc in self.rsearch(nid)])
+            if len(new_ancestors) == 0:
+                print(f"WARNING: node {nid} not found in the tree! Ignoring for LCA calculations")
+                continue
             possible_lcas = possible_lcas.intersection(new_ancestors)
+            if len(possible_lcas) == 0:
+                raise ValueError("ERROR: no valid LCA! Check that input nodes are found on the tree.")
             #if only one choice is left, just return that.
             if len(possible_lcas) == 1:
                 return possible_lcas.pop()
