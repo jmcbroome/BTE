@@ -1305,7 +1305,6 @@ cdef class MATree:
 
         Args:
             gtf_file (str): The path to the GTF file containing gene information. 
-
             fasta_file (str): The path to the FASTA file containing the reference genome.
         """
         if not exists(gtf_file):
@@ -1362,3 +1361,27 @@ cdef class MATree:
                     node_entropy_map[n.id] = (ev, rel_ev)
                 sample_count_map[n.id] = total
         return node_entropy_map
+
+    def LCA(self, node_ids: list) -> str:
+        '''
+        Find the last common ancestor of the input node IDs.
+
+        Args:
+            node_ids list[str]: A set of node_ids in string format. Must have a length of at least 2.
+        Returns:
+            str: The node_id of the last common ancestor.
+        '''
+        if len(node_ids) < 2:
+            raise ValueError("LCA requires a list with at two node IDs.")
+        possible_lcas_order = [anc.id for anc in t.rsearch(node_ids[0])]
+        possible_lcas = set(possible_lcas_order)
+        for nid in node_ids[1:]:
+            new_ancestors = set([anc.id for anc in t.rsearch(nid)])
+            possible_lcas = possible_lcas.intersection(new_ancestors)
+            #if only one choice is left, just return that.
+            if len(possible_lcas) == 1:
+                return possible_lcas.pop()
+        #otherwise, return the element of possible_lcas that's earliest in the order.
+        for pl in possible_lcas_order:
+            if pl in possible_lcas:
+                return pl
