@@ -231,6 +231,14 @@ cdef class MATNode:
     def branch_length(self):
         return self.n.branch_length
 
+    def set_branch_length(self, blen: float):
+        """Set the branch length for this node to the input float value.
+
+        args:
+            blen (float): Set the branch length to this value.
+        """
+        self.n.branch_length = blen
+
     def most_recent_annotation(self) -> list[str]:
         """Find the most recent clade annotations for the node in the node's ancestry.
 
@@ -363,7 +371,10 @@ cdef class MATree:
             elif vcf_file != None:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
-                self.t = bte.Tree()
+                # self.t = bte.Tree()
+                print("No input arguments passed; creating default tree.")
+                #pass a minimal newick. This is loaded as a root and a single child.
+                self.t = bte.create_tree_from_newick_string("();".encode("UTF-8"))
     
     def __repr__(self):
         return "MATree object with " + str(self.t.get_num_leaves(self.t.root)) + " leaves."
@@ -491,19 +502,19 @@ cdef class MATree:
         self.t = bte.create_tree_from_newick_string(nwk.encode("UTF-8"))
         self._tree_only = True
 
-    def write_newick(self, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True) -> str:
-        """Write a newick string from the tree.
+    def get_newick(self, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True) -> str:
+        """Extract a newick string from the tree.
 
         Args:
-            subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.
+            subroot (Optional[str], optional): Return a newick representing the subtree descended from this node. Defaults to the root.
 
             print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.
 
-            print_branch_len (bool, optional): Print branch lengths. Defaults to True.
+            print_branch_len (bool, optional): Include branch lengths in the newick output. Defaults to True.
 
             retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.
 
-            uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.
+            uncondense_leaves (bool, optional): Uncondense nodes before returning the newick. Defaults to True.
 
         Returns:
             str: A newick string representation of the tree.
@@ -516,6 +527,25 @@ cdef class MATree:
             se = self.t.get_node(subroot.encode("UTF-8"))
         bte.write_newick_string(ss,self.t,sr,print_internal,print_branch_len,retain_original_branch_len,uncondense_leaves)
         return ss.to_string().decode("UTF-8")
+
+    def write_newick(self, file: str, subroot: Optional[str] = None, print_internal: bool = True, print_branch_len: bool = True, retain_original_branch_len: bool = True, uncondense_leaves: bool = True):
+        """Print a newick string representing the tree/subtree to the target file.
+
+        Args:
+            file (str): Name of the file to write the newick to.
+
+            subroot (Optional[str], optional): Write a newick representing the subtree descended from this node. Defaults to the root.
+
+            print_internal (bool, optional): Include internal node names in the newick output. Defaults to True.
+
+            print_branch_len (bool, optional): Print branch lengths. Defaults to True.
+
+            retain_original_branch_len (bool, optional): Retain the original branch length attribute, if one was provided. Defaults to True.
+
+            uncondense_leaves (bool, optional): Uncondense nodes before writing the newick. Defaults to True.
+        """
+        with open(file,'w+') as of:
+            of.write(self.get_newick(subroot, print_internal, print_branch_len, retain_original_branch_len, uncondense_leaves))
 
     cpdef vector[string] _read_samples(self,samples):
         """Helper function which converts a Python list of bytes or string samples to a usable C++ string vector.
@@ -1245,7 +1275,7 @@ cdef class MATree:
         cdef Node* node
         for nid, annv in annotations.items():
             node = self.t.get_node(nid.encode("UTF-8"))
-            node.clade_annotations.clear()
+            node.clear_annotations()
             for an in annv:
                 node.clade_annotations.push_back(an.encode("UTF-8"))
         
@@ -1294,7 +1324,6 @@ cdef class MATree:
 
         Args:
             gtf_file (str): The path to the GTF file containing gene information. 
-
             fasta_file (str): The path to the FASTA file containing the reference genome.
         """
         if not exists(gtf_file):
@@ -1351,3 +1380,32 @@ cdef class MATree:
                     node_entropy_map[n.id] = (ev, rel_ev)
                 sample_count_map[n.id] = total
         return node_entropy_map
+
+    def LCA(self, node_ids: list) -> str:
+        '''
+        Find the last common ancestor of the input node IDs.
+
+        Args:
+            node_ids list[str]: A set of node_ids in string format. Must have a length of at least 2.
+        Returns:
+            str: The node_id of the last common ancestor.
+        '''
+        if len(node_ids) < 2:
+            raise ValueError("LCA requires a list with at two node IDs.")
+        possible_lcas_order = [anc.id for anc in self.rsearch(node_ids[0])]
+        possible_lcas = set(possible_lcas_order)
+        for nid in node_ids[1:]:
+            new_ancestors = set([anc.id for anc in self.rsearch(nid)])
+            if len(new_ancestors) == 0:
+                print(f"WARNING: node {nid} not found in the tree! Ignoring for LCA calculations")
+                continue
+            possible_lcas = possible_lcas.intersection(new_ancestors)
+            if len(possible_lcas) == 0:
+                raise ValueError("ERROR: no valid LCA! Check that input nodes are found on the tree.")
+            #if only one choice is left, just return that.
+            if len(possible_lcas) == 1:
+                return possible_lcas.pop()
+        #otherwise, return the element of possible_lcas that's earliest in the order.
+        for pl in possible_lcas_order:
+            if pl in possible_lcas:
+                return pl

@@ -6,7 +6,7 @@ import sys
 t = bte.MATree()
 
 def check_tree_struct(t1,t2):
-    return (t1.write_newick() == t2.write_newick())
+    return (t1.get_newick() == t2.get_newick())
 
 class TestMat(unittest.TestCase):
     @classmethod
@@ -53,7 +53,7 @@ class TestMat(unittest.TestCase):
             self.assertTrue(not (('A1234G' in h) and ('G1234A' in h)))
 
     def test_newick_load_write(self):
-        basic_newick = t.write_newick()
+        basic_newick = t.get_newick()
         nomut_t = bte.MATree(nwk_string = basic_newick)
         ntl = nomut_t.get_leaves_ids()
         self.assertTrue(len(ntl) > 0)
@@ -67,7 +67,7 @@ class TestMat(unittest.TestCase):
         os.remove("test.json")
 
     def test_newick_vcf_load_write(self):
-        nwk = t.write_newick()
+        nwk = t.get_newick()
         with open("test.nwk",'w+') as f:
             f.write(nwk)
         t.write_vcf("test.vcf")
@@ -103,3 +103,5 @@ class TestMat(unittest.TestCase):
         dump = t.dump_node_annotations()
         self.assertTrue(to_apply[t.root.children[0].id] == dump[t.root.children[0].id])
 
+    def test_lca(self):
+        self.assertTrue(t.LCA(['node_4','node_2']) == 'node_1')
