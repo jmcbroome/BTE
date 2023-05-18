@@ -231,6 +231,14 @@ cdef class MATNode:
     def branch_length(self):
         return self.n.branch_length
 
+    def set_branch_length(self, blen: float):
+        """Set the branch length for this node to the input float value.
+
+        args:
+            blen (float): Set the branch length to this value.
+        """
+        self.n.branch_length = blen
+
     def most_recent_annotation(self) -> list[str]:
         """Find the most recent clade annotations for the node in the node's ancestry.
 
@@ -363,7 +371,10 @@ cdef class MATree:
             elif vcf_file != None:
                 raise Exception("Loading from VCF requires a newick file.")
             else:
-                self.t = bte.Tree()
+                # self.t = bte.Tree()
+                print("No input arguments passed; creating default tree.")
+                #pass a minimal newick. This is loaded as a root and a single child.
+                self.t = bte.create_tree_from_newick_string("();".encode("UTF-8"))
     
     def __repr__(self):
         return "MATree object with " + str(self.t.get_num_leaves(self.t.root)) + " leaves."
@@ -1245,7 +1256,7 @@ cdef class MATree:
         cdef Node* node
         for nid, annv in annotations.items():
             node = self.t.get_node(nid.encode("UTF-8"))
-            node.clade_annotations.clear()
+            node.clear_annotations()
             for an in annv:
                 node.clade_annotations.push_back(an.encode("UTF-8"))
         
