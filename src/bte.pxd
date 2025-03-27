@@ -89,7 +89,7 @@ cdef extern from "usher/src/mutation_annotated_tree.hpp" namespace "Mutation_Ann
     void get_sample_mutation_paths (Tree* T, vector[string] samples, string mutation_paths_filename)
     void clear_tree(Tree tree)
 
-    void read_vcf (Tree* T, string vcf_filename, vector[Missing_Sample] missing_samples, bool create_new_mat)
+    void read_vcf (Tree* T, string& vcf_filename, vector[Missing_Sample]& missing_samples, bool create_new_mat)
 cdef extern from "usher/src/mutation_annotated_tree.cpp" nogil:
     pass
 cdef extern from "usher/src/usher_graph.hpp" nogil:
