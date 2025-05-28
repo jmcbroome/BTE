@@ -933,10 +933,9 @@ cdef class MATree:
         cdef vector[bte.Node*] ancestors = self.t.rsearch(sample, True)
         cdef cset[bte.Mutation] allm
         cdef cset[bte.Mutation].iterator allm_iter
-        cdef size_t i
+        cdef size_t i, j
         cdef bte.Node* cnode
         cdef bte.Mutation m, om
-        cdef cset[bte.Mutation].iterator oml
         cdef size_t ancs = ancestors.size()
         for i in range(ancs):
             #proceed in reverse order e.g. root to sample.
@@ -951,10 +950,10 @@ cdef class MATree:
                         fresh = False
                         #instead of inserting this mutation anew, update the old one.
                         #if they're opposite, they negate to prevent a mutation from something to itself.
-                        if m.mut_nuc == om.par_nuc:
-                            allm.erase(allm_iter)
-                        else:
-                            om.mut_nuc = m.mut_nuc
+                        allm.erase(allm_iter)
+                        if m.mut_nuc != om.par_nuc:
+                            m.par_nuc = om.par_nuc
+                            allm.insert(m)
                         break
                     postincrement(allm_iter)
                 if fresh:
